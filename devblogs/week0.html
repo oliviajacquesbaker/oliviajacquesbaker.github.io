@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Project Proposal: Physics-Based Grapple</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">May 19, 2023</div>
+                    </header>
+            </div>
+            <div class="col-lg-10">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <img class="img-fluid rounded" src="../assets/proposalImage.PNG" alt="..." />
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5 mb-4">I've always loved grapple mechanics, and have implemented a couple of "cheesy" grapples in the past, similar to <a href="https://www.youtube.com/watch?v=HPjuTK91MA8" target="_blank">this one</a> by Dave Game Development on YouTube. However, these "cheesy" grapples have limitations - they're often done by adding a joint component between the player and the anchor point and then drawing in a line between the two, so there is never any actual rope between the two objects that may cause whiplash and/or bungee movements. Or, in instances such as <a href="https://www.youtube.com/watch?v=w_20OrE-AR8" target="_blank">this tutorial</a> by Ryan Laley on YouTube or <a href="https://www.youtube.com/watch?v=TYzZsBl3OI0" target="_blank">this one</a> by Dave Game Development on YouTube, there isn't even a joint to begin with - there is only an added force on the player in the direction towards or around the anchor point. For all of these "cheesy" implementations, the line between the player and the anchor is always kept entirely straight, rather than curving with the momentum of a swing or etc.</p>
+                        <p class="fs-5 mb-4">When people look to make a grapple/swing mechanic that truly does have a rope-type object between the player and the anchor, one thing that is tried often is to create a set of points that make up the rope and then add joint components between all of those points, similar to <a href="https://www.youtube.com/watch?v=D4YCj4Tid0w" target="_blank">this tutorial</a> by World of Zero on YouTube. This is essentially taking the "cheesy" method and iterating it. Or, for those using Unreal, there is a <a href="https://docs.unrealengine.com/4.27/en-US/Basics/Components/CableComponent/" target="_blank">Cable Component plugin</a> made by Unreal that can be used starting in version 4.14 and forward.</p>
+                        <p class="fs-5 mb-4">However, these are more "easy" solutions to a problem I'd like to explore as an educational challenge, so for this project the constraints between points in the grapple rope will be manually calculated. This will be done using <a href="https://en.wikipedia.org/wiki/Verlet_integration" target="_blank">Verlet Integration</a> - a method of imposing distance constraints on a set of points that all have their own velocities. This has been used many times for rope simulations - it's in fact what Unreal used for the Cable Component plug in mentioned earlier, and what Hitman: Codename 47 used for <a href="https://web.archive.org/web/20080618020250/http://www.teknikus.dk/tj/gdc2001.htm" target="_blank">cloth, plant, and ragdoll simulations.</a> This last resource is important, as it has been used by several people to make grapple ropes that are similar to my own goals, such as <a href="https://www.reddit.com/r/godot/comments/gs4ldr/2d_rope_physicsgrappling_hook_examplepapers/" target="_blank">raineezy</a> and <a href="https://www.reddit.com/r/godot/comments/gs4ldr/comment/ji206x1/?utm_source=share&utm_medium=web2x&context=3" target="_blank">cotandbold</a> from Reddit. Their projects were 2D and used Godot, but the principals are similar.</p>
+                        <p class="fs-5 mb-4">To solve the problem of the rope visual looking curved rather than the standard straight edged line between points, I will use <a href="https://en.wikipedia.org/wiki/Polynomial_interpolation" target="_blank">polynomial interpolation</a> to create the visual line.</p>
+                        <h4 class="fw-bolder mb-4 mt-5">Listed Project Goals:</h4>
+                        <p class="fs-5 mb-4">
+                            <ul>
+                                <li class="fs-5">The project will be a 3D first person playground in Unreal 5.1 where the grapple may be experimented with.</li>
+                                <li class="fs-5">The player can anchor on large or stationary objects they can swing around or pull themselves towards (or drop themselves from, by letting out the rope even more).</li>
+                                <li class="fs-5">The player can grapple smaller/moveable objects they can pull towards themselves.</li>
+                                <li class="fs-5">When the player falls and gets caught by the rope of the grapple, the rope should display some elasticity.</li>
+                                <li class="fs-5">When the player grabs a moveable object with the grapple gun, the object should react to the force of the grapple.</li>
+                                <li class="fs-5">When the points that make up the rope of the grapple are not in a straight line, the visuals should represent a smoothly curved rope.</li>
+                                <li class="fs-5">Anchor decisions will be made via simple raycast; physics simulation will not begin until the player has already anchored the grapple.</li>
+                            </ul>
+                        </p>
+                        <h4 class="fw-bolder mb-4 mt-5">Expected Timeline:</h4>
+                        <p class="fs-5">
+                            <b>Week of 5/22:</b> Project setup and point generation along a line.
+                            <ul>
+                                <li class="fs-5">Finding city assets or building a city of cubes in Unreal, finding a grapple gun asset, setting up on Perforce, marking parts of the city as grabbable or hookable.</li>
+                                <li class="fs-5">Given a start and end location and a desired distance between points, generate the necessary number of points along the line. Should have a visual in game as small spheres for now, with straight lines connecting each point.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 5/29:</b> Add grapple latch on, add physics and restraints to the points in the generated line.
+                            <ul>
+                                <li class="fs-5">Add the basic mechanic of firing the grapple gun and, using a raycast to find an anchor point, latching on. Generate the points from last week on this line.</li>
+                                <li class="fs-5">Give each point manually controlled velocities.</li>
+                                <li class="fs-5">Using Verlet Integration, begin adding restraints between each point.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 6/5:</b> Fine tune the line restraints for swinging and desired elasticity.
+                            <ul>
+                                <li class="fs-5">It’s unlikely the restraints will be how I want them exactly after just the one week, as this is the physics lynch pin of the project. This is a buffer week for adjustment and fine tuning.</li>
+                                <li class="fs-5">By the end of this week, swinging should feel good, and when the player falls on a rope the rope should display a muted bungee / elastic snapback effect.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 6/12:</b> Allow Points to be dynamically removed from the line.
+                            <ul>
+                                <li class="fs-5">Allow players to reel in the rope, bringing them up to the anchor, by dynamically removing points in the line without abrupt snapping of rope size.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 6/19:</b> Allow Points to be dynamically added to the line.
+                            <ul>
+                                <li class="fs-5">Allow players to let out the rope, bringing them away further from the anchor, by dynamically adding points in the line without abrupt snapping of rope size.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 6/26:</b> Implement mid-air swinging controls.
+                            <ul>
+                                <li class="fs-5">Allow the player to add new movement or direction to a swing midair outside of the forces coming from the grapple itself.</li>
+                                <li class="fs-5">Momentum should be maintained smoothly.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 7/3:</b> Use created tools to add the “pull object” functionality.
+                            <ul>
+                                <li class="fs-5">Use the existing functionality to allow players to grapple smaller objects, in which the grapple gun itself acts as the anchor and pulls in the object to the player.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 7/10:</b> Update the visual of the rope to have natural curves.
+                            <ul>
+                                <li class="fs-5">Using polynomial interpolation, replace the point-to-point visual of the rope to have natural looking curves where applicable.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 7/17:</b> Bug fixing and/or adding collectibles to the scene.
+                            <ul>
+                                <li class="fs-5">Buffer week for bug fixing if there is anything that is not quite right with any grapple element.</li>
+                                <li class="fs-5">If this week is unneeded, the time will be spent working on creating a “collectibles” system, rewarding players for exploring the city area by letting them collect floating coins or similar by running through them.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 7/24:</b> Polish, final review, and consideration of tooling for LDs.
+                            <ul>
+                                <li class="fs-5">A “fire” animation is added to the grapple gun, as well as audio cues.</li>
+                                <li class="fs-5">Code is cleaned up, looking for anything that is not optimized or completely safe on top of readability.</li>
+                                <li class="fs-5">A write up is completed that includes thought on how this project could be integrated with an LD’s work in marking what the grapple interacts with; some sort of LD tool should be discussed as a hypothetical future project.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5"><b>The project will be complete and presented in its finality the week of 7/31.</b></p>
+                        <p class="fs-5">
+                            If the schedule moves faster than anticipated, there are several possible <b>stretch goals</b>:
+                            <ul>
+                                <li class="fs-5">Create a sort of in between object - something the player pulls but which also pulls them with a sense of "whiplash."</li>
+                                <li class="fs-5">Begin work on allowing players to swing around tight corners and have the rope bend appropriately. This would likely require dynamically checking if any part of the rope is near a surface it may need to collide with / bend around, and then adding in more points at higher frequency in that area.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">If the schedule moves slower than anticipated, curved visuals will be cut and the rope will have straight edges point-to-point.</p>
+                    </section>
+                </article>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>
