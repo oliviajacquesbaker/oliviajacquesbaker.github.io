@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+        <!-- Favicon-->
+        <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="../css/styles.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Responsive navbar-->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link active" href="../index.html">Portfolio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Page content-->
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Post content-->
+                    <article>
+                        <!-- Post header-->
+                        <header class="mb-4">
+                            <!-- Post title-->
+                            <h1 class="fw-bolder mb-1">Modular Card Ability System</h1>
+                            <!-- Post meta content-->
+                            <div class="text-muted fst-italic mb-2">Last worked on in May 2023</div>
+                        </header>
+                </div>
+                <div class="col-lg-8">
+                    <!-- Post content-->
+                    <article>
+                        <!-- Preview image figure-->
+                        <figure class="mb-4"><video class="img-fluid rounded" controls>
+                             <source src="../assets/cat.mp4" type="video/mp4">
+                             Your browser does not support the video tag.
+                             </video>
+                        </figure>
+                        <!-- Post content-->
+                        <section class="mb-5">
+                            <p class="fs-5 mb-4">This system was developed for Get in the Box Studio's ongoing Project Phoenix, which is a deck building roguelite. In order to be as efficient in card creation as possible, we designed cards to be composite objects made of one or many modular pieces. These modular pieces hold the actual functionality of the ability associated with the card. Combined with the way most components had any number of configurations - either from component specific options or by combination with the elemental status system the game had - this allowed many more unique ability cards to be made than programmers had bandwidth for.</p>
+                            <p class="fs-5 mb-4">An example of this modularity is as follows: a card may have a ranged base component with whatever projectile type is chosen, plus a headshot component that allows the ranged projectile to score headshots, plus a status application component that makes the ranged projectile stun any enemy it hits.</p>
+                            <p class="fs-5 mb-4">On top of my contributions to the design of this system and the many card components I created, I also created the card useage pipeline. Cards are stored in decks, which exhibit all the normal cycling and shuffling functionality, etc. The player choosing to "use" a deck will use the top card of that deck, which in turn activates all the card components within that card appropriately.</p>
+                            <h2 class="fw-bolder mb-4 mt-5">Specific Card Ability Components</h2>
+                            <p class="fs-5 mb-4">The list of specific card components, as well as examples of the sorts of ability cards they eventually created, is the following:</p>
+                            <p class="fs-5 mb-4"></p>
+                        </section>
+                    </article>
+                </div>
+                <!-- Side widgets-->
+                <div class="col-lg-4">
+                    <!-- Side widget-->
+                    <div class="card mb-4">
+                        <div class="card-header">Project Overview</div>
+                        <div class="card-body">Source Code: <span class="text-muted">Owned by Client</span></div>
+                        <div class="card-body">Languages and Tools: <span class="text-muted">C++, Unreal 5.1</span></div>
+                        <div class="card-body">Team Size: <span class="text-muted">15 total, 3 programmers</span></div>
+                        <div class="card-body">Personal Responsibilities: <span class="text-muted">Many "card components" that modularly create ability cards, the full card usage pipeline, card decks that cycle and shuffle, utility deck functions (swapping cards, searching on a card, etc).</span></div>
+                        <div class="card-body">Status: <span class="text-muted">Ongoing</span></div>
+                        <div class="card-body">Time Spent: <span class="text-muted">42 hours</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer-->
+        <footer class="py-5 bg-dark">
+            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+        </footer>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+    </body>
+</html>
