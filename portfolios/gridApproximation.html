@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Grid-Based Approximation</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">Last worked on in November 2021</div>
+                    </header>
+            </div>
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <video class="img-fluid rounded" controls>
+                            <source src="../assets/cat.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5 mb-4">This project was created as algorithmic practice. The problem statement I set out to solve was as follows:</p>
+                        <p class="fs-5 mb-4">Given a set of N points (x<sub class="fs-6">i</sub>, y<sub class="fs-6">i</sub>) with integer values for x<sub class="fs-6">i</sub> between 1 and M and real values for y<sub class="fs-6">i</sub>, find a partitioning of the interval [1, M] into contiguous intervals such that the error of approximating points in each interval element (induced by the partitioning on X axis) by the average value of y in the interval element is minimized. Include a penalty factor proportional to the total number of intervals the solution has.</p>
+                        <p class="fs-5 mb-4">I solved this problem with two methods: a tabulation approach and a memoization approach. For both methods, dyanmic programming was used. The first thing done was to sort the points with a Merge Sort, and then the error values of all points was precomputed such that the error of any interval in the set can be looked up by the algorithm later at constant time.</p>
+                        <p class="fs-5 mb-4">The tabulation solution used a bottom-up approach: for each point added to the considered set, find the optimal "last segment" based on error costs and the penalty of adding another interval. This works since the points have been sorted, so the latest considered point is the most rightward point in the considered set. If we know the optimal "last segment" for this point begins at X<sub class="fs-6">j</sub>, we must only add this optimal segment to the optimal segment ending at X<sub class="fs-6">j</sub>, and so on.</p>
+                        <p class="fs-5 mb-4">The memoization solution used a top-down approach: we still want to find the optimal "last segment" based on the considered set, but using recursion and a map of numbers of points to their optimal values, computations are only made when they are both necessary and previously uncompleted.</p>
+                    </section>
+                </article>
+            </div>
+            <!-- Side widgets-->
+            <div class="col-lg-4">
+                <!-- Side widget-->
+                <div class="card mb-4">
+                    <div class="card-header">Project Overview</div>
+                    <div class="card-body">Source Code: <a class="text-muted" href="https://github.com/oliviajacquesbaker/GridBasedApprox" target="_blank">Github Repo</a></div>
+                    <div class="card-body">Languages and Tools: <span class="text-muted">C++</span></div>
+                    <div class="card-body">Team Size: <span class="text-muted">1 (Individual Effort)</span></div>
+                    <div class="card-body">Personal Responsibilities: <span class="text-muted">User input, point set creation, tabulation to find optimal partitioning, memoization to find optmial partitioning.</span></div>
+                    <div class="card-body">Status: <span class="text-muted">Complete</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>

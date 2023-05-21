@@ -36,7 +36,7 @@
                     <!-- Post header-->
                     <header class="mb-4">
                         <!-- Post title-->
-                        <h1 class="fw-bolder mb-1">Educational Game Engine</h1>
+                        <h1 class="fw-bolder mb-1">Limited Game Engine</h1>
                         <!-- Post meta content-->
                         <div class="text-muted fst-italic mb-2">Last worked on in April 2023</div>
                     </header>
@@ -53,9 +53,24 @@
                     </figure>
                     <!-- Post content-->
                     <section class="mb-5">
-                        <p class="fs-5 mb-4">This game engine was created as an educational exercise. Throughout it, I learned about creating iterators, using smart pointers, [datum stuff], the cloneable pattern, </p>
-                        <h2 class="fw-bolder mb-4 mt-5">I have odd cosmic thoughts every day</h2>
-                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4">This game engine was created as an educational exercise. Throughout it, I learned about creating iterators, using smart pointers and union members, RTTI in C++, utelizing move semantics, and much more. Throughout the project I used design patterns such as the cloneable pattern, the factory pattern, the singleton pattern, the observer pattern, and the chain of responsibility pattern.</p>
+                        <p class="fs-5 mb-4">
+                            In the end, the engine was marked complete with:
+                            <ul>
+                                <li class="fs-5">3 custom containers - a templated singly linked list, a templated vector, and a templated hashmap.</li>
+                                <li class="fs-5">Iterators for all custom containers - forward iterators for the list and the hashmap and a random access iterator for the vector.</li>
+                                <li class="fs-5">A custom engine-specific variable used to represent game objects, all of which implement engine-specific RTTI to avoid using the global C++ system.</li>
+                                <li class="fs-5">A mapping of the engine-specific variable type to key names as part of a dynamic hierarchical database.</li>
+                                <li class="fs-5">Engine specific variables that represent 'actions,' such as incrementing other variables or performing a while loop.</li>
+                                <li class="fs-5">An event system that uses callback functions to avoid multiple inheritence and pending lists to avoid iteration invalidation.</li>
+                                <li class="fs-5">A method of automatically generating the engine-specific schema of a user-created class at compile-time using attribute lists.</li>
+                                <li class="fs-5">A factory capable of creating any registered class based on its class name, for use in "blueprinting."</li>
+                                <li class="fs-5">A generic parsing system, and a parsing specification to decode Json tables representing engine-specific game objects and actions, for use in "blueprinting."</li>
+                                <li class="fs-5">Exhaustive unit testing to ensure correctness and completeness.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5 mb-4">At one point in development, the event system was altered to use multithreading. This was ultimately removed as it felt a poor place to use multithreading - there were too many involved data races and even without the mutex locks waiting on those races, it didn't seem to add much efficiency to the system - but a snippet of this version of the code can be seen near the end of the above video. </p>
+                        <p class="fs-5 mb-4">As a disclaimer, the GameTime, GameClock, and base RTTI files were provided to me; integration and tests were completed by myself.</p>
                     </section>
                 </article>
             </div>
@@ -64,7 +79,7 @@
                 <!-- Side widget-->
                 <div class="card mb-4">
                     <div class="card-header">Project Overview</div>
-                    <div class="card-body">Source Code: <a class="text-muted" href="">Github Repo</a></div>
+                    <div class="card-body">Source Code: <a class="text-muted" href="https://github.com/oliviajacquesbaker/FIEAGameEngine" target="_blank">Github Repo</a></div>
                     <div class="card-body">Languages and Tools: <span class="text-muted">C++, JsonCpp</span></div>
                     <div class="card-body">Team Size: <span class="text-muted">1 (Individual Effort)</span></div>
                     <div class="card-body">Personal Responsibilities: <span class="text-muted">Custom containers and iterators, structures and organization to represent game objects and scene hierarchy, an event system, a "blueprints"-type method of interfacing, exhaustive unit testing.</span></div>
