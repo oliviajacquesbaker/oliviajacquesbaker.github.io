@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Shadow Shape Detection Game - <i>Gloom</i></h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">Last worked on in April 2022</div>
+                    </header>
+            </div>
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <video class="img-fluid rounded" controls>
+                            <source src="../assets/cat.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5 mb-4">This project was completed as my undergraduate senior project. The goal was to create a game that allowed for real time shape recognition of game shadows, such that the shadows could be categorized as various "tools" the player could use. For example, if the player could find or create a thin rectangular shadow, they could "steal" the shadow in order to create a sword to attack with. Though I worked on other parts of the game as well, my primary task was ownership over the system that detected and categorized these shadows.</p>
+                        <p class="fs-5 mb-4">This problem had several steps. First, shadows had to be detected as such to begin with. I used the standard method of capturing a camera's view into a render plane, but to binarize the data into strictly "shadow" and "not shadow," I had to modify existing standards for image binarization. Typically the desired algorithm here would be adaptive thresholding, which sets threshold values for many smaller regions of the image and can take multiple passes of all the pixels, but that created too much lag when used in combination with the rest of the system. Instead, I used local contrast to binarize images in a single pass of their pixels. The algorithm ended up looking like this:</p>
+                        <p class="fs-5 mb-4"><img style="text-align: center; display: block;" src="../assets/gloomBinarization.PNG" /></p>
+                        <p class="fs-5 mb-4">After binarization, the simplified contours of the shape had to be identified. I tried at first to do this using purely geometric calculations - using the angles between each point to denote "signifigance," for example - but in the end nothing got as good of results for as of a little performance hit as image recognition did. As such, I ended up creating a custom DLL plugin to interface with OpenCV through Unity. This plugin was relatively quite simple; only a single function available, which took in the image data from Unity and used OpenCV's contour detection functions to spit back out a set of points. I did need to compress the image by several magnitudes before passing it along for performance reasons, though; I used Unity's built in bilinear interpolation function to determine the pixel values for the compressed images.</p>
+                        <p class="fs-5 mb-4">Once the contour points were identified, I used simple averaging to discover the center of the set and then ordered the points by descending angular values from the center point so the set would be ordered. In theory, this would then be where shape categorization happens, using the number of points and the relative angles between them to identify triangles, rectangles, and so on.</p>
+                        <p class="fs-5 mb-4">In practice, there was another step necessary - discovering and removing "outlier" points. Although the "real" shadow may not really be a normal polygon, the player may very well interpret it as one, and for the game to be any good at all the player's perception of shapes had to match what the detection and categorization system deemed them to be. An example of this sort of discrepency is below:</p>
+                        <p class="fs-5 mb-4"><img style="text-align: center; display: block;" src="../assets/gloomOutlier.PNG" /></p>
+                        <p class="fs-5 mb-4">Due to the game level design causing outliers to almost never appear in any other formation than the one above, I was able to assume that these outliers only needed to be considered for shapes of exactly 5 points. With that assumption, I was able to take any set of 5 points and calculate the area of the triangles formed by each point along with its two adjacent points - in a true rectangle, these areas would all be proportionally significant to the full area of the shape, so outliers could be easily discarded from the rest.</p>
+                        <p class="fs-5 mb-4">From there, other parts of the shadow system were about largely managing resources - for example, only running the system when "significant change" is detected such as large movements, lights turning on or off, or objects getting moved.</p>
+                    </section>
+                </article>
+            </div>
+            <!-- Side widgets-->
+            <div class="col-lg-4">
+                <!-- Side widget-->
+                <div class="card mb-4">
+                    <div class="card-header">Project Overview</div>
+                    <div class="card-body">Source Code: <a class="text-muted" href="https://github.com/oliviajacquesbaker/seniorproject_S22" target="_blank">Github Repo</a></div>
+                    <div class="card-body">Languages and Tools: <span class="text-muted">C#, C++, Unity, OpenCV</span></div>
+                    <div class="card-body">Team Size: <span class="text-muted">3 total, all programmers</span></div>
+                    <div class="card-body">Personal Responsibilities: <span class="text-muted">Image binarization and compression, a custom OpenCV plugin for Unity, outlier point detection, categorization of point sets into shapes, enemy and boss AI, most art and animation, general game concepts and design.</span></div>
+                    <div class="card-body">Status: <span class="text-muted">Complete</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>
