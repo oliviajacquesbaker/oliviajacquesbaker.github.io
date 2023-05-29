@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Week 1 - Setup & Point Generation</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">May 28, 2023</div>
+                    </header>
+            </div>
+            <div class="col-lg-10">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <img class="img-fluid rounded" src="../assets/pointGenFromGun.png" alt="..." />
+                        <div class="text-muted fst-italic mb-2 mt-2">Evenly distributed points generated along a line between a start and end position.</div>
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5"><b>Logged Hours:</b> 15</p>
+                        <p class="fs-5">
+                            <b>Week of 5/22:</b> Project setup and point generation along a line.
+                            <ul class="checkList">
+                                <li class="fs-5">Finding city assets or building a city of cubes in Unreal, finding a grapple gun asset, setting up on Perforce, marking parts of the city as grabbable or hookable.</li>
+                                <li class="fs-5">Given a start and end location and a desired distance between points, generate the necessary number of points along the line. Should have a visual in game as small spheres for now, with straight lines connecting each point.</li>
+                                <li class="fs-5"> <span style="color:mediumseagreen">(Bonus)</span> Add the basic mechanic of firing the grapple gun and, using a raycast to find an anchor point, latching on. Generate the points on this line.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5 mb-4">This week started with basic project setup. I'm using Unreal Engine 5.1 for this project, and began with their first person C++ template. I made some adjustments to their character - adding a sprint and a horizontal speed-based FOV change, as well as setting the grapple gun to be a default component - but largely left it alone. I also made a "city" map for demoing the grapple from the level prototyping tools, and set up a simple respawn system for if the player ever swings themselves off of the map. For the grapple gun asset, I'm repurposing the shooter gun that comes with the first person template.</p>
+                        <p class="fs-5 mb-4">For point generation, I divide the distance between a start and end location by the desired distance between generated points, take the integer ceiling of that, and say that's the number of "rope segments" I have, where the number of points is just one more than the number of segments. The actual distance between points then is almost always slightly smaller than the inputted desired distance, but in a situation where the exact request is impossible, I'd rather default to giving the user more accuracy over less. Actual point placement is done just by multiplying the direction vector from start to end locations by the real distance between points and using that as an increment value for the position of points being generated.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/generateRopePoints.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for point generation along a line. The result is shown above as this week's cover image.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">The visuals are currently generated with debug spheres and a line batcher creating line segments between each point. The line batcher could in theory work in release builds, but it isn't well optimized for it and is just meant as a stand-in until a later week when I focus on creating the curved visuals.</p>
+                        <p class="fs-5 mb-4">I also set up the mapping of the grapple gun itself to the line generation. Physics simulation will not begin until the player has "latched on," so finding anchor points is done with a set of sphere casts. Originally, I had used only a single sphere cast, but this comes with one of two issues: either the grapple is inaccurate at close range, or it is too accurate at long range, which leads to perceived failure. At long range, the player should be able to grapple on things they <i>think</i> they successfully reached, which means a much larger sphere cast than would be necessary for short range. This is especially important for fast, movement-based environments. However, having a large sphere cast radius at short range produces other inaccuracies; the impact point of a sphere may be very different than what the player expects, especially at angled views.</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <img class="img-fluid rounded" src="../assets/grappleLatchBefore.png" alt="..." />
+                                    <div class="text-muted fst-italic mb-2 mt-2">Inaccurate discovery of a point hit by the edge of a too-large sphere cast.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <img class="img-fluid rounded" src="../assets/grappleLatchAfter.png" alt="..." />
+                                    <div class="text-muted fst-italic mb-2 mt-2">Corrected behavior, achieved by segmenting the sphere cast.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">In order to resolve this, I broke the sphere cast into several parts. The user specifies a minimum and maximum cast radius, as well as how many segments to use, and then I loop through all the inbetween radii with early outs for finding a blocking hit. This worked well; the difference is especially obvious in angled instances such as the above before and after images.</p>
+
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/segmentRaycast.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for segmented sphere casts with increasing radii.</div>
+                        </figure>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/grappleLatchAfar.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">The segmented sphere cast from afar, showing the three different sized segments and the allowance for inaccuracy at long range.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">Sphere casts are also of course done centered on the player's camera view for perceived accuracy, and limited to a custum trace channel for optimization. Also, although the point generation has been bound to the player's grapple gun, the player themselves has not yet been bound to the line since no rope restraints have been put on it yet.</p>
+                        <p class="fs-5 mb-4">Next up will be putting those restraints, as well as individual velocities, on the points using Verlet Integration. By next week I hope to have a rough draft of this - the player should be held firm on one side of the rope, and the points should droop with gravity if the player moves closer.</p>
+                        <p class="fs-5 mb-4"></p>
+
+                    </section>
+                </article>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>

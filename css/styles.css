@@ -182,6 +182,30 @@ address {
   line-height: inherit;
 }
 
+.checkList li::marker {
+    content: '✓ ';
+    color: mediumseagreen;
+}
+
+.checkList ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.checkListItem li {
+    position: relative;
+    padding-left: 1.5em;
+}
+
+.checkListItem li:before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    width: 1em;
+    height: 1em;
+    color: mediumseagreen;
+}
+
 ol,
 ul {
   padding-left: 2rem;
