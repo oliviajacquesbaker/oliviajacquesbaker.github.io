@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Week 3 - Hanging on Ropes</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">June 11, 2023</div>
+                    </header>
+            </div>
+            <div class="col-lg-10">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <img class="img-fluid rounded" src="../assets/hangingCover.PNG" alt="..." />
+                        <div class="text-muted fst-italic mb-2 mt-2">The player hanging from a rope above the ground.</div>
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5"><b>Logged Hours:</b> 15</p>
+                        <p class="fs-5">
+                            <b>Week of 5/29:</b> Fine-tune line and player restraints for swinging / hanging.
+                            <ul class="checkList">
+                                <li class="fs-5">Allow players to hang off a rope up off the ground.</li>
+                                <li class="fs-5">Ropes should display a muted bungee / elastic snapback effect when the player falls on them.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5 mb-4">Last week, the rope was simulated and constrained only for players that remained on the ground - for a player that was falling, the rope would infinitely stretch to meet them. This week was about resolving this, and it proved much more difficult than expected.</p>
+                        <p class="fs-5 mb-4">To begin with, rope hanging was considered a separate issue from constraining a player horizontally because when the player remained on the ground they still had full control over their movement. When the rope was pulled tight, the player wasn't able to walk beyond that point, but they were still able to walk in general - their movement was just projected onto the allowed radius until they came closer and gave the rope more slack. In this scenario, the player was "in charge" of the rope. However, when the player is hanging from a rope above the ground, they cannot walk or otherwise move freely. Outside of the downwards pull of gravity, the player will only feel the movement influences of the rope swaying or etc. In this scenario, the rope is the one in charge.</p>
+                        <p class="fs-5 mb-4">My problems stemmed from splitting this issue like this - which was fine - but then trying to solve both problems in the same way - which was not. For the situation where the player could move freely on the ground while holding a rope that still had to be simulated even when it wasn't restraining the player, I had solved the problem by considering the rope and the player as separate entities that were controlled in different ways. I spent a long time trying to solve rope hanging in a similar way, simply considering how to constrain the player without considering the rope.</p>
+                        <p class="fs-5 mb-4">I couldn't modify input like I had with the horizontal restraints, since the movement that needed to be constrained (gravity) was not input driven. I couldn't just change the player's position by projecting their out-of-bounds movement onto the allowed radius, since as I had discovered last week, that caused an unfortunate jittering effect as the player rapidly moved back and forth. With both of these methods off the table, I believed my only course of action was to "counter" gravity by adding an opposing force to the player. This would keep the player simulated smoothly without jittering, and theoretically keep them at the limit of the rope. Simply adding forces pointing straight up was quickly dismissed as inaccurate, so I moved on to trying to calculate what the tension of the rope would be, then adding a force to the player replicating that.</p>
+                        <p class="fs-5 mb-4">Broken down as in the below image, I solved for <code>W<sub>1</sub></code>, took its length, and multipled that by the normalized direction vector of the rope. I then added this force to the player, as if the rope was actually applying tension.</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <img class="img-fluid rounded" src="../assets/ropeTensions.png" alt="..." />
+                                    <div class="text-muted fst-italic mb-2 mt-2">Vector breakdown of a force-based approach.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="../assets/bounceForce.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">Results of a force-based approach.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">Unfortunately, this approach was faulty. It did keep the player up, but it resulted in a "bouncing" motion as seen in the above video. I was so convinced that this was the correct approach, though, that I spent hours here - tweaking scaling values, solving and resolving for <code>W<sub>1</sub></code>, and even also attempting to calculate and add centripetal forces to the equation. The results were never any better than the above - either the player would not have enough force to be held up, the force would be too inconsistant and result in a similar bouncing motion, or the results would be so powerful that the player would be thrown up into space.</p>
+                        <p class="fs-5 mb-4">Eventually, out of frustration, I decided to try something else. I turned off gravity, took away control of the player from Unreal, and just made the player's position match the end of the rope. This, despite still having problems, was far more successful than my previous approaches, and I realized what had been going wrong before: the rope has no tension to begin with, or any sort of "real physics" for me to be replicating on to the player. It's a nice simulation, but in the end it is still a simulation - the points are not constrainted to each other by a series of tensions from one point to another, they're relaxed into a resting position just by constantly readjusting the positions of points based on half the error value. Trying to get "real" player physics to match faked, game-y rope physics just wasn't smart. And in the first place, the rope is supposed to be "in charge" during player hanging, so of course it makes sense that I should just use the position of the rope end to calculate the player's position directly.</p>
+                        <p class="fs-5 mb-4">I revised my work so the player became considered another "point" on the line, with a resting distance of zero from the real end point of the rope. When the player entered a hanging state, I changed the player's movement mode to a custom one so I could take complete control of the physics, then simulated the player exactly the same way I did with the rope using Verlet Integration and Jakobsen's method.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/simulatePlayerCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for simulating the player's movement when they hang from a rope. To work, I have to log the previous and current positions even when this code is not "in control." It should also be noted that the position logged here is the tip of the grapple gun, not the player's real position.</div>
+                        </figure>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/restrainPlayerCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for restraining the player's movement when they hang from a rope. It is largely identical to the constraints used for the rope points, except the resting distance between the "points" is considered as zero.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">There were still a couple issues that needed to be resolved here, though. The first was that when hanging, the player could "swing" simply by looking away from the anchor point. This was because I was using the Unreal default gun and animations, where the gun never changes rotation. When the player looked away, the gun moved away also instead of remaining in place looking at the wall, and then the player would be moved to adjust for the constraint, and then the gun would move more, and so on and so on. Essentially, this was a consequence of using the gun for distance calculations rather than player center, but then continuing to use the same Unreal gun animations that move the gun position even without moving player position.</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="../assets/swingWithLook.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">The gun's fixed position in the camera's view allowing for the player to artificially create swinging motions just by looking away.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">I ended up manually adjusting the rotation of the gun to always face the anchor point while the player is hanging - this code is visible in the <code>RestrainOwningCharacter</code> function in one of the above images, where I calculate the look direction and then add the default rotator of the gun. This is not a perfect long term solution - what truly should happen is the complete abandonment of the default animations, and then setting up a gun whose position and rotation I am in complete control of. However, I did not have the time for that this week, so I'll be using this more temporary solution for now. Hopefully I can come back to address this during my buffer week for bug fixing.</p>
+                        <p class="fs-5 mb-4">The other issue that needed to be resolved was that jumping backwards into a hanging position caused the player to be thrown towards the anchor.</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="../assets/jerkForward.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">The player jumping backwards - briefly entering a "hanging" state - and triggering the rope to yank them forwards towards the anchor.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">Up until this point, I had not messed with the forces acting on the rope points when the player was in a hanging state. As such, the rope behaved as it would with no weight attached to it, where there was a natural sort of "whiplash" when the rope was swung out beyond its limits, and the player was made to simply follow that. I didn't want to get rid of this behavior completely, because one of my goals was to have a rope that would in fact display this elastic snapback behavior when the player fell on it. However, it was way too overblown here - adding additional forces on the rope points to simulate the player's influence was enough to mute it appropriately.</p>
+                        <p class="fs-5 mb-4">In the end, I was left with a rope that the player could hang on smoothly, and when the player fell on it there was the desired muted bungee effect. I still have some cleanup I'd like to do here - primarily with the gun and the odd way it looks when forced out of its animation poses - but I'm overall happy with where I'm at for the goals of rope hanging specifically.</p>
+                            <figure class="mb-4">
+                                <video class="img-fluid rounded" controls>
+                                    <source src="../assets/resultsOfRopeHang.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="text-muted fst-italic mb-2 mt-2">The final current state of rope hanging.</div>
+                            </figure>
+                        <p class="fs-5 mb-4">Next week, I'll allow points to be dynamically removed from the line. This will allow the player to pull themselves up to the anchor point. The main goal will be to accomplish this without any abrupt snapping of rope size as points are removed.</p>
+                        <p class="fs-5 mb-4"></p>
+                        <div class="row">
+                            <div class="col-lg-11">
+                                <a class="btn btn-primary" href="week2.html">Previous</a>
+                            </div>
+                            <div class="col-lg-1">
+                                <a class="btn btn-primary" href="../devblog.html">Next</a>
+                            </div>
+                        </div>
+                    </section>
+                </article>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>
