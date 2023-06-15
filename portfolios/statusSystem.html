@@ -36,7 +36,7 @@
                         <!-- Post header-->
                         <header class="mb-4">
                             <!-- Post title-->
-                            <h1 class="fw-bolder mb-1">Modular Card Ability System</h1>
+                            <h1 class="fw-bolder mb-1">Elemental Status System</h1>
                             <!-- Post meta content-->
                             <div class="text-muted fst-italic mb-2">Last worked on in June 2023</div>
                         </header>
@@ -51,17 +51,17 @@
                              </video>
                         </figure>-->
                         <figure class="mb-4">
-                            <img class="card-img-top" src="../assets/cardcompsImage.png"/>
+                            <img class="card-img-top" src="../assets/statusCover.png"/>
                         </figure>
                         <!-- Post content-->
                         <section class="mb-5">
-                            <p class="fs-5 mb-4">This system was developed for <a href="https://www.linkedin.com/company/get-in-the-box-studios/about/" target="_blank">Get in the Box Studio's</a> ongoing project <i>Deckweaver: Descent into Chaos</i>, which is a deck building roguelite slated for release in early August 2023. In order to be as efficient in card creation as possible, we designed cards to be composite objects made of one or many modular pieces. These modular pieces hold the actual functionality of the ability associated with the card. Combined with the way most components had any number of configurations - either from component specific options or by combination with the elemental status system the game had - this allowed many more unique ability cards to be made than programmers had bandwidth for.</p>
-                            <p class="fs-5 mb-4">An example of this modularity is as follows: a card may have a ranged base component with whatever projectile type is chosen, plus a headshot component that allows the ranged projectile to score headshots, plus a status application component that makes the ranged projectile stun any enemy it hits.</p>
-                            <p class="fs-5 mb-4">On top of my contributions to the design of this system and the many card components I created, I also created the card useage pipeline. Cards are stored in decks, which exhibit all the normal cycling and shuffling functionality, etc. The player choosing to "use" a deck will use the top card of that deck, which in turn activates all the card components within that card appropriately.</p>
-                            <p class="fs-5 mb-4">For complete flexibilty, the time at which a card component is activated during the card use process can also be customized. In the previous example, the headshot component would be configured to activate when a hit caused by a different card component is reported, whereas the ranged base component would activate simply on card use.</p>
+                            <p class="fs-5 mb-4">This system was developed for <a href="https://www.linkedin.com/company/get-in-the-box-studios/about/" target="_blank">Get in the Box Studio's</a> ongoing project <i>Deckweaver: Descent into Chaos</i>, which is a deck building roguelite slated for release in early August 2023. Many of the card based abilities of the game involve status application or interaction, so the status system had to be flexible to allow for any number of combinations of effects.</p>
+                            <p class="fs-5 mb-4">Each status has the potential to have other status types that counter it (i.e. water countering fire), enhance it (i.e. water enhancing cold to create frozen), or create some sort of external effect (i.e. heat and poison creating an explosion). These interactions between statuses were built to be easily puzzle pieced together, so that new statuses could be created that interact in unique ways with the other statuses with no additional programmatic effort.</p>
+                            <p class="fs-5 mb-4">Beyond interactions with other statuses, each status also has the potential to affect the character it is applied to in numerous ways. For example, the affected character may generate block, have their speed altered, become stunned, or have a modifier applied to their outgoing damage amount.</p>
+                            <p class="fs-5 mb-4">Statuses also provide the opportunity to affect a character conditionally over time. For example, statuses give the option to continuously damage the character, or have the character continuously generate an AOE effect, but these continuous actions can be limited to only be successful if all of a specified list of conditions are met. These conditions could include requiring the character's health to be above or below a certain percent, or that the character has a certain status already applied to them, or that the character is actively attacking or being attacked.</p>
+                            <p class="fs-5 mb-4">Of course, with a system this flexible, statuses within the game quickly expanded out of being only elemental. Other status examples include simple speed boosts, temporary invincibility, or non-elemental preset statuses such as 'Thorns' which has the player continuously take damage in exchange for generating an AOE effect every time something external to the player does damage to them.</p>
+                            <p class="fs-5 mb-4">Adjacent to this system was a system of environmental status-based obstacles. These obstacles generally just applied a status to characters that entered them, such as a pond generating 'wet' statuses, but they also had the option to be configured to conduct various types of damage. For example, if a character is standing in a pond, and something with an electric status damage type hits another part of the pond, the pond will conduct that damage and status type to all the characters within it. Those characters, who are already wet from the pond, will then become stunned from the preset interaction of the wet and shocked statuses.</p>
                             <p class="fs-5 mb-4">The source code and a video discussion of this system will be made available upon project completion in August, but please feel free to reach out to chat about it before then.</p>
-                            <!--<h2 class="fw-bolder mb-4 mt-5">Specific Card Ability Components</h2>
-                            <p class="fs-5 mb-4">The list of specific card components, as well as examples of the sorts of ability cards they eventually created, is the following:</p>-->
                             <p class="fs-5 mb-4"></p>
                         </section>
                     </article>
@@ -74,9 +74,9 @@
                         <div class="card-body">Source Code: <span class="text-muted">Will be available on game release</span></div>
                         <div class="card-body">Languages and Tools: <span class="text-muted">C++, Unreal 5.1</span></div>
                         <div class="card-body">Team Size: <span class="text-muted">15 total, 3 programmers</span></div>
-                        <div class="card-body">Personal Responsibilities: <span class="text-muted">Ownership of the full card usage pipeline, many "card components" that modularly create ability cards, card decks that cycle and shuffle, utility deck functions (swapping cards, searching on a card, etc).</span></div>
+                        <div class="card-body">Personal Responsibilities: <span class="text-muted">Ownership of the base status system, management of status interactions, all elemental status presets and status based environmental obstacles, many non-elemental statuses as both base and higher level functionality.</span></div>
                         <div class="card-body">Status: <span class="text-muted">Ongoing</span></div>
-                        <div class="card-body">Time Spent: <span class="text-muted">42 hours</span></div>
+                        <div class="card-body">Time Spent: <span class="text-muted">44 hours</span></div>
                     </div>
                 </div>
             </div>
