@@ -53,7 +53,7 @@
                     <section class="mb-5">
                         <p class="fs-5"><b>Logged Hours:</b> 15</p>
                         <p class="fs-5">
-                            <b>Week of 6/5:</b> Allow ropes to change size smoothly.
+                            <b>Week of 6/12:</b> Allow ropes to change size smoothly.
                             <ul class="checkList">
                                 <li class="fs-5">Allow Points to be dynamically removed from the line.</li>
                                 <li class="fs-5">Implement player "pull in" behavior on a shortening line.</li>
@@ -64,38 +64,98 @@
                         <p class="fs-5 mb-4">The first part of this was to allow the rope to smoothly change sizes such that the player could reel themselves in towards the anchor or let the rope out to give themselves more slack. Originally, my schedule had broken this into two tasks for separate weeks, but upon analyzing the problem I felt that theywere best solved together, so I handled both point removal and point addition together.</p>
                         <p class="fs-5 mb-4">As for why the problem of rope extension and shortening is a problem of adding and removing points instead of the simpler answer of just adjusting the rest length between the existing points, consider the importance of the rest length to begin with. Because only the points themselves are simulated and not the space between them, the rest length betweeen points can also be considered the precision of the rope. Changing this precision dramatically will result in unwanted rope behavior, especially as the rest length increases and the precision decreases - it will begin to feel much more like a collection of hard sticks on joints rather than a proper rope.</p>
                         <p class="fs-5 mb-4">However, point addition and removal cannot happen without rest length modification, either. If points were added or removed without changing anything else, the length of the rope would "pop" to the new size suddenly and jerk the player around. To resolve this, I created a couple "transitionary" points that had modifiable rest lengths, and only added or removed a point from the rope when one of the transitionary rest lengths reached a threshold value.</p>
+                        <p class="fs-5 mb-4">One transitionary point was for shrinking the rope size, and was just assigned as whichever point came right before the anchor point. When the rope size was shortened, the rest length between this transitionary point <code>T<sub>i</sub></code> and the anchor point was reduced until it reached zero, at which point that point was removed. Then we simply change the index we are considering to be <code>T<sub>i</sub></code> to be the new penultimate point and do it again. The second transitionary point was for increasing the rope size, and was not a normally generated point. This point was artificially inserted between <code>T<sub>i</sub></code> and the anchor point and given a position equal to the anchor point and a rest length of zero between it and the anchor. Then, when the length of the rope was increased, the rest length between this point <code>T<sub>o</sub></code> and the anchor increased until it reached the "normal" resting length that all other points are constrained to, at which point a new <code>T<sub>o</sub></code> is inserted once more on top of the anchor to repeat the process.</p>
                         <div class="row">
                             <div class="col-lg-6">
                                 <figure class="mb-4">
-                                    <img class="img-fluid rounded" src="../assets/TransitionPoints.png" alt="..." />
+                                    <img class="img-fluid rounded" src="../assets/transitionPoints.png" alt="..." />
                                     <div class="text-muted fst-italic mb-2 mt-2">Diagram of the transitionary point locations.</div>
                                 </figure>
                             </div>
                             <div class="col-lg-6">
                                 <figure class="mb-4">
                                     <video class="img-fluid rounded" controls>
-                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/1449648984ab69df5a5de9ef3ff7731c49930fd4/assets/bounceForce.mp4" type="video/mp4">
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/4ec9865cdc3cd1d8ca10f559a0e873b883e9f454/assets/dynamicRopeSize.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                     <div class="text-muted fst-italic mb-2 mt-2">A rope smoothly adjusting its length by adding and removing points.</div>
                                 </figure>
                             </div>
                         </div>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4">Above is a diagram of the placement of these transitionary points and a video showing successful smooth rope length adjustment. Note that once <code>T<sub>o</sub></code> was artificially inserted on top of the anchor point, <code>T<sub>i</sub></code> was pushed back, and its resting length is now considered to be between itself and <code>T<sub>o</sub></code> instead of the anchor.</p>
+                        <p class="fs-5 mb-4">Considering these transitionary points, the updated point generation and constraint code is as follows:</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/updatedGenPointsCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Updated code for point generation. Remember that only <code>T<sub>o</sub></code> is artificially inserted into the line; <code>T<sub>i</sub></code> is just a naturally occuring point we take the index of.</div>
+                        </figure>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/updatedRestrainCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Updated code for point constraints.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">And here is the code for actually shrinking and lengthening the rope, with a few additional considerations that were not mentioned above. Most important is that when a point is added or removed, both of the transitionary indices are affected rather than just the one. Additionally, the best way to ensure that there is only one "abnormal" rest length is to make sure the other transitionary distance is at its rest length before modiying the currently relevant one - for example, making sure that the transitionary out distance has been shortened back to zero before trying to shorten the transitionary in distance.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/shortenExtendCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for shortening and lengthening a rope by adjusting the transitionary resting lengths.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">Just that alone - the actual adjustment of rope length - is enough to consider 'letting the rope out' to be completed. However, there is additional work to bee done when pulling the rope in. Namely, when the rope is taut, shortening it should pull the player in towards the anchor.</p>
+                        <p class="fs-5 mb-4">When the player is hanging on the rope, no adjustment needs to be made, since last week we gave control of the player to the rope when the player is hanging. As such, shortening the rope length will move the player as-is. When the player is on the ground and they are the ones in control of the rope, however, they are constrained only by projecting their movement into the allowed radius with no further adjustments. Since shortening the rope can happen without movement input, we will need to step in to create an additional constraint here.</p>
+                        <p class="fs-5 mb-4">Luckily, I was able to rely on the tools Unreal provides for artificial player input. There was only one distinction I had to make: the difference between being pulled forward and being pulled upwards. Being pulled forwards is straightforward, but for being pulled upwards I chose to handle it in a way that might be considered bit contrary to the other movement decisions I've made thus far.</p>
+                        <p class="fs-5 mb-4">Until now, I've generally looked for an exaggerated realism when considering movement. The player is a bit bouncier on the rope than would be realistic, but otherwise I was looking for a mostly natural feeling rope simulation, and that required me to think about how things would behave according to physics. If I were to follow that path here, being pulled upwards on the rope would look very similar to being pulled horizontally by it - the player would slowly and smoothly ascene up off the ground and enter a hanging position, slowly being dragged further upwards as this happens.</p>
+                        <p class="fs-5 mb-4">However, I did not want that behavior here because - in my opinion - it's boring. For a grapple to be fun, the player needs ways to get massive momentum, and one of the best ways to do this is to have them hurtle towards their anchor point as if they've been yanked in that direction by the rope. As such, I chose for vertical-dominant pulls to launch the player towards the anchor. I didn't take this so far as to drag the player up to the anchor entirely, but I think this helps to give this grapple an amount of fun factor that a simple simulation lacks.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/pullLetOutCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for adjusting character movement when they are on the ground but are shortening a taut rope.</div>
+                        </figure>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/4ec9865cdc3cd1d8ca10f559a0e873b883e9f454/assets/initialropePullIn.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">Results of the above code - horizontal pulls look largely like the player moving forward as if walking, and vertical pulls add extra force into the movement.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">However, there's still one major issue with pulling the player in towards the anchor. When the player is moved as part of the hanging simulation, their movement is swept for collision and stopped early if anything is hit. However, when being pulled straight upwards, this collision happens at even the smallest movement, since the destination point is closer to the wall than the player is capable of getting. This causes the player to get stuck in one location as the rope tries to shrink, which desyncs the player from the rope as well.</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <img class="img-fluid rounded" src="../assets/collisionUpwards.png" alt="..." />
+                                    <div class="text-muted fst-italic mb-2 mt-2">Diagram of the collision that happens when moving a player up a line.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/4ec9865cdc3cd1d8ca10f559a0e873b883e9f454/assets/problemsWithPullIn.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">The result of the player getting stuck on collision when pulled upwards.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">To resolve this, I check if a collision blocked the movement of the player to the goal and if so, attempt to manually project the player out of the collision. I do this by using the normal of the anchor point to look towards the destination point, finding the first blocking location on this projection to decide where the player should sit against the wall. If that projection fails as well, I try again and this time use the normal of the original blocking collision; it may be that the anchor is on a surface perpendicular to the blocking collision. Note that the reason why I try the anchor's normal before the normal of the blocking collision despite this possibility is that in testing I found that edge case to be significantly more rare than a case where the anchor is around a corner from where the player has gotten stuck. When the player is around a corner, the blocking normal would keep them held around the corner instead of allowing them to fall around it.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/updatedCustomMovementCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for requesting non colliding destinations. This exists in the custom movement mode of a rope hang, after the player's constraints have been simulated.</div>
+                        </figure>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/nonCollidingCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for finding the correct non colliding destination.</div>
+                        </figure>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/4ec9865cdc3cd1d8ca10f559a0e873b883e9f454/assets/betterPull.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">Players getting pulled upwards towards an anchor no longer get stuck on collision.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">With that, the issues caused by pulling in a taut rope are resolved, leaving us with thee above results. The current rope grapple state is now missing only one main thing: the ability to add player movement influence when hanging on the rope.</p>
+                        <p class="fs-5 mb-4">With all this progress, I'm now two weeks ahead of my expected schedule. The next thing on my list is to use the tools I've built so far to add an option to pull objects towards the player with the grapple. However, since I have so much extra time, I'd like to first take a moment to clean up some of what I already have. Primarily, I'd like to replace the Unreal default gun animations with custom gun movement that better fits what I'm doing - the temporary fix I implemented last week is by no means perfect, and occasionally causes an odd "rolling" effect when the player is hanging on a rope due to the forced rotation. I will then begin work on implementing pullable objects, but don't expect it to be done by the end of next week.</p>
                         <p class="fs-5 mb-4"></p>
                         <p class="fs-5 mb-4"></p>
                         <p class="fs-5 mb-4"></p>
                         <p class="fs-5 mb-4"></p>
                         <div class="row">
                             <div class="col-lg-11">
-                                <a class="btn btn-primary" href="week2.html">Previous</a>
+                                <a class="btn btn-primary" href="week3.html">Previous</a>
                             </div>
                             <div class="col-lg-1">
                                 <a class="btn btn-primary" href="../devblog.html">Next</a>
