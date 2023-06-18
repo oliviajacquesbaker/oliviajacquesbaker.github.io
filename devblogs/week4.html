@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Week 4 - Smoothly Adjusting Rope Sizes</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">June 18, 2023</div>
+                    </header>
+            </div>
+            <div class="col-lg-10">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <img class="img-fluid rounded" src="../assets/ropeSizeCover.png" alt="..." />
+                        <div class="text-muted fst-italic mb-2 mt-2">A rope extending - the red debug sphere represents the added point.</div>
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5"><b>Logged Hours:</b> 15</p>
+                        <p class="fs-5">
+                            <b>Week of 6/5:</b> Allow ropes to change size smoothly.
+                            <ul class="checkList">
+                                <li class="fs-5">Allow Points to be dynamically removed from the line.</li>
+                                <li class="fs-5">Implement player "pull in" behavior on a shortening line.</li>
+                                <li class="fs-5"> <span style="color:mediumseagreen">(Bonus)</span> Allow Points to be dynamically added to the line.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5 mb-4">Last week, the fundamentals of a grapple were finalized - the player could grapple a location, generate a rope, and be constrained by that rope appropriately in all directions. This week began the process of gamifying the rope by adding controls to change parts of its constraints as the player was still attached to it.</p>
+                        <p class="fs-5 mb-4">The first part of this was to allow the rope to smoothly change sizes such that the player could reel themselves in towards the anchor or let the rope out to give themselves more slack. Originally, my schedule had broken this into two tasks for separate weeks, but upon analyzing the problem I felt that theywere best solved together, so I handled both point removal and point addition together.</p>
+                        <p class="fs-5 mb-4">As for why the problem of rope extension and shortening is a problem of adding and removing points instead of the simpler answer of just adjusting the rest length between the existing points, consider the importance of the rest length to begin with. Because only the points themselves are simulated and not the space between them, the rest length betweeen points can also be considered the precision of the rope. Changing this precision dramatically will result in unwanted rope behavior, especially as the rest length increases and the precision decreases - it will begin to feel much more like a collection of hard sticks on joints rather than a proper rope.</p>
+                        <p class="fs-5 mb-4">However, point addition and removal cannot happen without rest length modification, either. If points were added or removed without changing anything else, the length of the rope would "pop" to the new size suddenly and jerk the player around. To resolve this, I created a couple "transitionary" points that had modifiable rest lengths, and only added or removed a point from the rope when one of the transitionary rest lengths reached a threshold value.</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <img class="img-fluid rounded" src="../assets/TransitionPoints.png" alt="..." />
+                                    <div class="text-muted fst-italic mb-2 mt-2">Diagram of the transitionary point locations.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/1449648984ab69df5a5de9ef3ff7731c49930fd4/assets/bounceForce.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">A rope smoothly adjusting its length by adding and removing points.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <div class="row">
+                            <div class="col-lg-11">
+                                <a class="btn btn-primary" href="week2.html">Previous</a>
+                            </div>
+                            <div class="col-lg-1">
+                                <a class="btn btn-primary" href="../devblog.html">Next</a>
+                            </div>
+                        </div>
+                    </section>
+                </article>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>
