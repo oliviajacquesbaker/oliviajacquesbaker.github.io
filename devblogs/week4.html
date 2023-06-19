@@ -51,13 +51,15 @@
                     </figure>
                     <!-- Post content-->
                     <section class="mb-5">
-                        <p class="fs-5"><b>Logged Hours:</b> 15</p>
+                        <p class="fs-5"><b>Logged Hours:</b> 14</p>
                         <p class="fs-5">
                             <b>Week of 6/12:</b> Allow ropes to change size smoothly.
                             <ul class="checkList">
-                                <li class="fs-5">Allow Points to be dynamically removed from the line.</li>
+                                <li class="fs-5">Allow points to be dynamically removed from the line.</li>
                                 <li class="fs-5">Implement player "pull in" behavior on a shortening line.</li>
-                                <li class="fs-5"> <span style="color:mediumseagreen">(Bonus)</span> Allow Points to be dynamically added to the line.</li>
+                                <li class="fs-5"> <span style="color:mediumseagreen">(Bonus)</span> Allow points to be dynamically added to the line.</li>
+                                <li class="fs-5"> <span style="color:mediumseagreen">(Bonus)</span> Allow players to swing when hanging on a rope.</li>
+                                <li class="fs-5"> <span style="color:mediumseagreen">(Bonus)</span> Ensure momentum is kept when a rope is destroyed.</li>
                             </ul>
                         </p>
                         <p class="fs-5 mb-4">Last week, the fundamentals of a grapple were finalized - the player could grapple a location, generate a rope, and be constrained by that rope appropriately in all directions. This week began the process of gamifying the rope by adding controls to change parts of its constraints as the player was still attached to it.</p>
@@ -142,16 +144,31 @@
                         </figure>
                         <figure class="mb-4">
                             <video class="img-fluid rounded" controls>
-                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/4ec9865cdc3cd1d8ca10f559a0e873b883e9f454/assets/betterPull.mp4" type="video/mp4">
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/fbf89075956bc4d16008bf291977de0f0774e6b2/assets/betterPull.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="text-muted fst-italic mb-2 mt-2">Players getting pulled upwards towards an anchor no longer get stuck on collision.</div>
                         </figure>
                         <p class="fs-5 mb-4">With that, the issues caused by pulling in a taut rope are resolved, leaving us with thee above results. The current rope grapple state is now missing only one main thing: the ability to add player movement influence when hanging on the rope.</p>
+                        <p class="fs-5 mb-4">Luckily, this is a fairly straightforward task: I just had to pass along input information to the grapple rope when the player is in the custom hanging movement mode. Then, I could apply the input as a force on the player, which would then get processed in the player's simulation step alongside gravity.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/swingCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for adding player input as a force during rope hang. The <code>AddForcetoPlayer</code> function is called within the <code>Move</code> function of the owning character, which processes keyboard input based on player look direction.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">And then finally, in order for the movement to feel smooth, I had to ensure that momentum was maintained when the player let go of the rope. If you remember, we had previously talked about how velocity can be attained by subtracting our previous position from our current one; this was how we achieved Verlet Integration for simulating the rope. I used that same concept now determine a base movement direction for adding a force to the player on rope destruction, and then scaled it to get the exact feeling I was looking for.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/releaseCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for maintaining momentum when jumping off a rope.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">Finally, we've completed all movement controls for players on ropes!</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/fbf89075956bc4d16008bf291977de0f0774e6b2/assets/betterPull.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">Final current state of rope swinging.</div>
+                        </figure>
                         <p class="fs-5 mb-4">With all this progress, I'm now two weeks ahead of my expected schedule. The next thing on my list is to use the tools I've built so far to add an option to pull objects towards the player with the grapple. However, since I have so much extra time, I'd like to first take a moment to clean up some of what I already have. Primarily, I'd like to replace the Unreal default gun animations with custom gun movement that better fits what I'm doing - the temporary fix I implemented last week is by no means perfect, and occasionally causes an odd "rolling" effect when the player is hanging on a rope due to the forced rotation. I will then begin work on implementing pullable objects, but don't expect it to be done by the end of next week.</p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
                         <p class="fs-5 mb-4"></p>
                         <div class="row">
                             <div class="col-lg-11">
