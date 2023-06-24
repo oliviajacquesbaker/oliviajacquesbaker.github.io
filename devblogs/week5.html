@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Week 5 - Cleanup and Midway Checkpoint</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">June 25, 2023</div>
+                    </header>
+            </div>
+            <div class="col-lg-10">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <img class="img-fluid rounded" src="../assets/beginPullCover.png" alt="..." />
+                        <div class="text-muted fst-italic mb-2 mt-2">A rope extending - the red debug sphere represents the added point.</div>
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5"><b>Logged Hours:</b> 15</p>
+                        <p class="fs-5">
+                            <b>Week of 6/19:</b> Cleanup and Midway Assessment.
+                            <ul class="checkList">
+                                <li class="fs-5">Improve the gun animation and rotation handling during hanging.</li>
+                                <li class="fs-5">Begin work on pulling objects with the grapple rope.</li>
+                                <li class="fs-5">Assess current progress alongside the schedule.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5 mb-4">Last week, I had gotten quite a bit ahead of my schedule and so wanted to take this week to pause and clean up some of what I had. In particular, the state in which I left the gun's animation / rotation when the player used it to hang from a rope bothered me. When rope hanging was first implemented, I had forced the gun to always rotate to look at the anchor. Without this forced rotation, the player could artificially create swinging motions by simply looking quickly away from the anchor point, since the simulations and restraints were done using the gun tip position but that gun tip was parented under the player's camera. Quickly looking away meant quickly moving that child gun object, artificially adding movement into the simulation.</p>
+                        <p class="fs-5 mb-4">This forced 'look at' solution did resolve that issue, removing any artificial motion during quick look movements, but it brought another problem into the simulation: the 'look at' considered all axis of rotation, and so when the player swung back and forth, the gun would "roll" with the motion.</p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4"></p>
+                        <div class="row">
+                            <div class="col-lg-11">
+                                <a class="btn btn-primary" href="week4.html">Previous</a>
+                            </div>
+                            <div class="col-lg-1">
+                                <a class="btn btn-primary" href="../devblog.html">Next</a>
+                            </div>
+                        </div>
+                    </section>
+                </article>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>
