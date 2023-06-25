@@ -47,7 +47,7 @@
                     <!-- Preview image figure-->
                     <figure class="mb-4">
                         <img class="img-fluid rounded" src="../assets/beginPullCover.png" alt="..." />
-                        <div class="text-muted fst-italic mb-2 mt-2">A rope extending - the red debug sphere represents the added point.</div>
+                        <div class="text-muted fst-italic mb-2 mt-2">Debug visualization of this week's jerky movement from pulling an object in with the rope.</div>
                     </figure>
                     <!-- Post content-->
                     <section class="mb-5">
@@ -62,21 +62,139 @@
                         </p>
                         <p class="fs-5 mb-4">Last week, I had gotten quite a bit ahead of my schedule and so wanted to take this week to pause and clean up some of what I had. In particular, the state in which I left the gun's animation / rotation when the player used it to hang from a rope bothered me. When rope hanging was first implemented, I had forced the gun to always rotate to look at the anchor. Without this forced rotation, the player could artificially create swinging motions by simply looking quickly away from the anchor point, since the simulations and restraints were done using the gun tip position but that gun tip was parented under the player's camera. Quickly looking away meant quickly moving that child gun object, artificially adding movement into the simulation.</p>
                         <p class="fs-5 mb-4">This forced 'look at' solution did resolve that issue, removing any artificial motion during quick look movements, but it brought another problem into the simulation: the 'look at' considered all axis of rotation, and so when the player swung back and forth, the gun would "roll" with the motion.</p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
-                        <p class="fs-5 mb-4"></p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/9e58f70e9db57fc395bb32420977ff16d2c288f5/assets/jankRotateOriginal.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">The gun "rolling" with the swinging motion of the player in order to maintain the correct look at rotation.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">This original solution had admittedly been made pretty quickly, so going in to this week I had thought 'well, of course it isn't perfect, but I'm sure I can make something much better without too much trouble.' Unfortunately, what followed next was a series of failures that ate up a huge portion of the time I had available this week.</p>
+                        <p class="fs-5 mb-4">Part of the issue, I realized later in my work this week, was that I had failed to correctly diagnose the problem to begin with. I had at first been quite convinced that the gun was simply rotating incorrectly in some way, and all I needed to do was correct that rotation. What exactly was "incorrect" was something I had trouble pinning down, though - at first I thought it was a result of the gun's pivot point being the center of the gun rather than the tip that I was actually trying to rotate and calculate around. When that approach failed, I thought it was an issue of the "look at" calculation receiving a global up vector rather than one that would be more normal to the wall the player was hanging against. When that too failed, I thought perhaps it was simply that - in the additional rotations that happened to ensure the gun remained visible in the player's hands - rotation was getting added where it shouldn't be and should be zeroed out or at least clamped to prevent it from going too crazy. Throughout all of these iterations of thinking I had identified the "real" problem, I tried everything from making custom look at and aim solver functions to editing the model's pivot and orientation to simply hardcoding parts of the rotation.</p>
+                        <p class="fs-5 mb-4">Of course, none of these were the solution. The rotation was exactly as it should be in order to match the simulation of the rope as best as possible, hence why I couldn't figure out what was "wrong" with it. Some of my attempts certainly fixed the gun's rotation to be facing a particular way, but doing so always compromised the simulation itself and resulted in the player's movement - as an offset of the gun tip's movement and rotation - misbehaving.</p>
+                        <p class="fs-5 mb-4">What 'misbehaving' meant depended on what exactly the rotation alteration was - generally, though, it meant that I was artifically adding way, way too much movement into the system by "correcting" the rotation of the gun tip outside of the simulation's bounds. Since Verlet Integration means we use position to directly calculate velocity, altering the rotation of the gun so the gun tip was no longer in the perfectly precise position I had started this journey with meant I was directly affecting the velocity of the simulation, starting with the last point in the rope. Often, this would cause the player to go flying in some way or another - for your amusement, here's a selection of such results from the various attempts I made:</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/9e58f70e9db57fc395bb32420977ff16d2c288f5/assets/jankRotate.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">Results of moving gun pivot to gun tip and adjusting simulation accordingly.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/9e58f70e9db57fc395bb32420977ff16d2c288f5/assets/jankRotate1.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">Results of forcing a different up vector for look at calculations.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/9e58f70e9db57fc395bb32420977ff16d2c288f5/assets/jankRotate2.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">Results of attempting to zero out or clamp anything but the pitch.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/9e58f70e9db57fc395bb32420977ff16d2c288f5/assets/jankRotate3.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">Results of using the player themself for simulation and restraint calculations.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">The final video there was a moment of particular frustration for me, because at that point I had finally realized that my assessment of the problem was wrong and had thought myself on the right path at last. I had decided to abandon the approach of altering the gun itself - let the gun rotate to look at the anchor exactly how it wants, and instead, I would complete all simulation and constraints using the player themself. Where before I considered the gun tip to be an additional point on the rope with a resting distance of zero from the end point of the rope, I now considered the player's center to be that point with a resting distance based on the difference between the player's location and that of the rope end. Then the player's position could be calculated directly as opposed to being an offset of the gun, and looking around wouldn't have any effects since this time the camera would be a child of the calculation center. The gun was then made to be part of a separate calculation, only used for appearances.</p>
+                        <p class="fs-5 mb-4">Of course, as you can see, it didn't work. The player's center just isn't naturally part of the rope - I was trying to use the resting distance multiplied by the normalized vector direction pointing from rope end to player center to make up for the way the player center is naturally out of line with the rope, but I couldn't get it to work with enough accuracy that it would keep the rope stable.</p>
+                        <p class="fs-5 mb-4">In the end, I had to accept that there really were only two options that kept the rope simulation accurate enough to feel good to the player: either I allow the gun to "roll" to maintain perfect rotation to prevent artificial "look" movement, or I allow artificial "look" movement to get rid of the rolling motion. Or at least, those were the only two options I felt were realistic for me - perhaps there is another solution that I was unable to think of, but by this point I had already sunk so many hours into trying various solutions that I wanted to pick something and move on. This was never meant to be a focus of this project, and I feel there are better ways to spend my time. Even if I'm currently ahead, I don't want to lose that lead; I'd rather spend time on a stretch goal that improves the simulation itself than staying here fiddling with the appearance of the gun.</p>
+                        <p class="fs-5 mb-4">Playing with the two options, I decided that from the player's perspective, the artificial look movement felt better overall. Combined with the swinging controls from last week, it actually tends to help the player motion, whereas the "rolling" motion was often distracing and unhelpful, even if it might have been a bit more accurate.</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/9e58f70e9db57fc395bb32420977ff16d2c288f5/assets/resignedRotation.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">The current state of gun rotation during rope hanging - the rolling motion has been removed, but the player can still force artificial movement.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">I settled on the above results. This did end up being a small tweak from what I had previous to the rolling solution rather than a complete revert - I still wanted the gun to point upwards rather than being locked within the hand's animations, as keeping it pointed upwards both added some realism to the simulation and dampened the amount of artificial movement the player could get by looking around. In order to find this rotation, I calculated the "look at" rotation of an imaginary point that existed at the same height as the actual anchor point but positioned directly ahead of the player, such that there would never be any roll.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/rotateAdjustments.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code adjustment for the gun's forced rotation during player hanging.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">It was certainly frustrating to put in so many hours only to end up just using this small piece of code as a "good enough," but it was also certainly time to move on to more important parts of this project.</p>
+                        <p class="fs-5 mb-4">Next up was to begin work on adding functionality for allowing some objects to be pulled towards the player with the grapple hook, rather than pulling the player themself. The setup for this was trivial - just adding another tag for the grapple gun to look for when latching on to something and adding a quick way for the grapple hook to be able to tell the rope it generates whether the anchor point is movable or not, since until this point the anchor point had been excluded from simulation. Then came the actual pulling behavior.</p>
+                        <p class="fs-5 mb-4">I began by treating the pulled object the same way I handled a hanging player - pretending as if it were part of the rope, with a resting distance of zero from the rope point it was attached to. This originally resulted in a jerky, inconsistent pulling motion, which I assumed to be a problem similar to the way the player had been getting stuck on collisions when getting pulled up the rope against a wall. However, when I visualized where collisions were happening, they were only happening occasionally along the box's path, and trying to project out of those collisions didn't help the same way it did for the player being pulled up against a wall.</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/9e58f70e9db57fc395bb32420977ff16d2c288f5/assets/initialPullObject.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">Jerky movement of a box being pulled towards the player.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <img class="img-fluid rounded" src="../assets/occasionalCollision.png" alt="..." />
+                                    <div class="text-muted fst-italic mb-2 mt-2">Visualization of occasional collisions where the box is trying to move.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">The problem was that the rope wasn't registering that the distance between start and end points was great enough to represent a taut rope, or that when this did register it moved the box by too great a distance and immedietely lost the tautness, or both. I'm still actively working through this problem now. The current iteration of my solution reconstrains the box to the rope end point on every frame, but only resolves collisions on frames where the rope registers as taut, but clearly this is not the solution either...</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/9e58f70e9db57fc395bb32420977ff16d2c288f5/assets/floatingPullObject.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">The current state of gun rotation during rope hanging - the rolling motion has been removed, but the player can still force artificial movement.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">I'll keep chomping away at this problem next week. My next step will be to just rewrite what I have - currently, I'm using edited copy-pasted code from handling the player, and I suspect that there might be a discrepency there that I'm not accounting for. Hopefully rewriting it will force me to discover any such issues.</p>
+                        <p class="fs-5 mb-4">Looking beyond next week, I figure now at the midway point is a good a time as any to make some adjustments to my schedule. When I had originally written my plan for this project, I had expected the issue of being able to dynamically extend and shorten ropes to take me much longer than it did, and I had valued that feature over collision detection of rope points with world geometry. I expected collision detection to be a large issue I wouldn't have time for in the remaining weeks of my schedule, so assigned it to a stretch goal. However, with my current progress, I believe I have the time for it if I remove "visual line smoothing" as a primary goal and replace it with the rope collision.</p>
+                        <p class="fs-5 mb-4">Additionally, I can create visuals that look mostly smooth even without polynomial interpolation and just using straight lines between each point, given that the distance between each point is small enough. The non-smoothness is only really noticed when the rope bunches up on itself during very quick bouncing motions. As such, I currently value attempting to resolve rope collision over pursuing polynomial interpolation for visual smoothness, and would like to swap those two goals out.</p>
+                        <p class="fs-5 mb-4">With my current progress ahead of schedule, and with that swap in priorities, the rest of this project should look like this:</p>
+                        <p class="fs-5">
+                            <b>Week of 6/26:</b> Finalize the “pull object” functionality.
+                            <ul>
+                                <li class="fs-5">Use the existing functionality to allow players to grapple smaller objects, in which the grapple gun itself acts as the anchor and pulls in the object to the player.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 7/3:</b> Begin work on rope collision solving with world objects.
+                            <ul>
+                                <li class="fs-5">Using projection techniques used previously in the project, begin resolving collisions with the individual rope points and world geometry.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 7/10:</b> Complete work on rope collision solving with world objects.
+                            <ul>
+                                <li class="fs-5">Using projection techniques used previously in the project, finish resolving collisions with the individual rope points and world geometry.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 7/17:</b> Bug fixing and/or adding collectibles to the scene.
+                            <ul>
+                                <li class="fs-5">Buffer week for bug fixing if there is anything that is not quite right with any grapple element.</li>
+                                <li class="fs-5">If this week is unneeded, the time will be spent working on creating a “collectibles” system, rewarding players for exploring the city area by letting them collect floating coins or similar by running through them.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5">
+                            <b>Week of 7/24:</b> Polish, final review, and consideration of tooling for LDs.
+                            <ul>
+                                <li class="fs-5">A “fire” animation is added to the grapple gun, as well as audio cues.</li>
+                                <li class="fs-5">Code is cleaned up, looking for anything that is not optimized or completely safe on top of readability.</li>
+                                <li class="fs-5">A write up is completed that includes thought on how this project could be integrated with an LD’s work in marking what the grapple interacts with; some sort of LD tool should be discussed as a hypothetical future project.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5 mb-4">And then of course my stretch goals become the visual line smoothing alongside the possibility of a third object type that can be pulled but has the player experience whiplash when doing so.</p>
                         <p class="fs-5 mb-4"></p>
                         <div class="row">
                             <div class="col-lg-11">
