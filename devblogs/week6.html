@@ -73,8 +73,8 @@
                         <p class="fs-5 mb-4">What I wanted to do here was to compromise between Unreal's physics simulation and my own calculations. Unreal's simulation would be what provided the objects' inclination to fall and tip over and bounce in various situations, and my own calculations would allow for enough control over the simulation for it to be possible to constain objects to the rope without extreme instability.</p>
                         <p class="fs-5 mb-4">Unfortunately, without full control of the simulation, Verlet Integration alongside Jakobsen's method did not perform as well as it does in other situations. This video had a couple other problems going on with it - for one, my balance of how much control my constraints versus Unreal's simulation were each given was off - but part of the problem demonstrated here was that without complete correction from Jakobsen's method, the simulation quickly began to spin out of control.  </p>
                         <figure class="mb-4">
-                            <video class="img-fluid rounded" controls> <!--pullObjectInsane-->
-                                <source src="" type="video/mp4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/59917bf544b30a8adec250afe4986fc00e8c727c/assets/pullObjectInsane.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="text-muted fst-italic mb-2 mt-2">An early attempt at compromising between Unreal's physics simulation and my own calculations.</div>
@@ -89,8 +89,8 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <figure class="mb-4">
-                                    <video class="img-fluid rounded" controls> <!--pullObjectFloatFall-->
-                                        <source src="" type="video/mp4">
+                                    <video class="img-fluid rounded" controls> 
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/59917bf544b30a8adec250afe4986fc00e8c727c/assets/pullObjectFloatFall.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                     <div class="text-muted fst-italic mb-2 mt-2">"Floaty" fall caused by giving the rope too much control in the Z correction.</div>
@@ -98,8 +98,8 @@
                             </div>
                             <div class="col-lg-6">
                                 <figure class="mb-4">
-                                    <video class="img-fluid rounded" controls> <!--pullObjectBetterFall-->
-                                        <source src="" type="video/mp4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/59917bf544b30a8adec250afe4986fc00e8c727c/assets/pullObjectBetterFall.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                     <div class="text-muted fst-italic mb-2 mt-2">Improved fall from rebalancing and giving Unreal more control.</div>
@@ -109,8 +109,8 @@
                         <p class="fs-5 mb-4">It should be noted that the four "compare and contrast" videos above were actually taken after I had finished this week's work, and just went back to revert small parts of my code to show the difference a specific change had. This is because throughout all this week, genuine in progress videos trying to demonstrate an issue were all a bit overshadowed by a different problem that plagued me most of the week, and is the reason I say the code above is only the first part of constraining pulled objects.</p>
                         <p class="fs-5 mb-4">When I created the functionality for allowing the player to pull themselves up a rope while hanging, I had to address the issue of the player naturally colliding with the wall they were up against while trying to move forward, since the anchor was closer to the wall than the player could be. I had resolved this issue by projecting out from the collision normal at the goal destination and raycasting back inwards to find the exact point of collision for a corrected location. This sort of consideration was also required for pulling objects, since every time I corrected the position of an object to remain constrained on the rope, I could be moving it through the floor or other surrounding objects. However, trying to resolve this the same way I did with the player...</p>
                         <figure class="mb-4">
-                            <video class="img-fluid rounded" controls> <!--pullObjectInsane2-->
-                                <source src="" type="video/mp4">
+                            <video class="img-fluid rounded" controls> 
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/59917bf544b30a8adec250afe4986fc00e8c727c/assets/pullObjectInsane2.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="text-muted fst-italic mb-2 mt-2">An object jittering sideways through excessive correction.</div>
@@ -125,8 +125,8 @@
                             </div>
                             <div class="col-lg-6">
                                 <figure class="mb-4">
-                                    <video class="img-fluid rounded" controls> <!--pullObjectTeleport-->
-                                        <source src="" type="video/mp4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/59917bf544b30a8adec250afe4986fc00e8c727c/assets/pullObjectTeleport.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                     <div class="text-muted fst-italic mb-2 mt-2">The result - objects teleporting above their normal position.</div>
@@ -142,8 +142,8 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <figure class="mb-4">
-                                    <video class="img-fluid rounded" controls> <!--pullObjectNoRot-->
-                                        <source src="" type="video/mp4">
+                                    <video class="img-fluid rounded" controls> 
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/59917bf544b30a8adec250afe4986fc00e8c727c/assets/pullObjectNoRot.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                     <div class="text-muted fst-italic mb-2 mt-2">An object pulled over a slope and remaining even.</div>
@@ -151,8 +151,8 @@
                             </div>
                             <div class="col-lg-6">
                                 <figure class="mb-4">
-                                    <video class="img-fluid rounded" controls> <!--pullObjectWithRot-->
-                                        <source src="" type="video/mp4">
+                                    <video class="img-fluid rounded" controls> 
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/59917bf544b30a8adec250afe4986fc00e8c727c/assets/pullObjectWithRot.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                     <div class="text-muted fst-italic mb-2 mt-2">An object pulled over a slope and matching rotation.</div>
@@ -169,8 +169,8 @@
                             </div>
                             <div class="col-lg-6">
                                 <figure class="mb-4">
-                                    <video class="img-fluid rounded" controls> <!--pullObjectJitterbug-->
-                                        <source src="" type="video/mp4">
+                                    <video class="img-fluid rounded" controls> 
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/59917bf544b30a8adec250afe4986fc00e8c727c/assets/pullObjectJitterbug.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                     <div class="text-muted fst-italic mb-2 mt-2">The result - object jittering against walls during collision correction.</div>
@@ -179,8 +179,8 @@
                         </div>
                         <p class="fs-5 mb-4">Once all of these issues were corrected, I was finally able to pull objects in all directions with mostly natural behavior. It's not perfect, but I think this is close to being the best it can be without having full control of my own more complex physics simulation, so that I don't have to compromise with Unreal.</p>
                         <figure class="mb-4">
-                            <video class="img-fluid rounded" controls> <!--pullObjectFinal-->
-                                <source src="" type="video/mp4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/59917bf544b30a8adec250afe4986fc00e8c727c/assets/pullObjectFinal.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="text-muted fst-italic mb-2 mt-2">The final state of pulling objects.</div>
