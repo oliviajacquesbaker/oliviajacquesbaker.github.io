@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Week 6 - Pulling Objects</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">July 2, 2023</div>
+                    </header>
+            </div>
+            <div class="col-lg-10">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <img class="img-fluid rounded" src="../assets/pullObjectCover.png" alt="..." />
+                        <div class="text-muted fst-italic mb-2 mt-2">Pulling an object over part of a slope.</div>
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5"><b>Logged Hours:</b> 11</p>
+                        <p class="fs-5">
+                            <b>Week of 6/26:</b> Finalize the “pull object” functionality.
+                            <ul class="checkList">
+                                <li class="fs-5">Allow the player to grapple smaller objects to pull them towards them.</li>
+                                <li class="fs-5">Objects being pulled should behave naturally (i.e. falling off ledges if pulled too close to the edge).</li>
+                                <li class="fs-5">Objects being pulled should experience an impulse force when first grappled.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5 mb-4">When I'd left off last week, I had begun progress on the 'pull objects' functionality, but it wasn't off to the best of starts...</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/9e58f70e9db57fc395bb32420977ff16d2c288f5/assets/floatingPullObject.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">Last week's state of pulling objects with the grapple gun.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">I'd been using an edited copy-pasted version of how I handled players on ropes at this point, and figured that this week I'd discover some typo or similarly overlooked issue that fixed things. Unfortunately, what turned out to be incorrect in last week's efforts were so many little things that it would be easier to describe this week's efforts as a new solution rather than a series of corrections.</p>
+                        <p class="fs-5 mb-4">To begin with, external objects are a bit of an odd case when it comes to simulating them as part of the rope. With the player, people are already used to games allowing them to get very close to edges without falling off, and other unrealistic elements of game simulations. However, for an object external to the player that can be seen from multiple angles, it looks very odd if you have a cube 75% the way off of a ledge but remaining solidly on the ledge regardless. To put it another way, the simplistic simulation I've been using for the player when they are "part of the rope" is <i>too</i> simplistic. In order to fully control a simulation that would be realistic enough to account for these discrepencies, though, I would be bordering on building my own physics engine from scratch, which is certainly not ideal for a project like this.</p>
+                        <p class="fs-5 mb-4">What I wanted to do here was to compromise between Unreal's physics simulation and my own calculations. Unreal's simulation would be what provided the objects' inclination to fall and tip over and bounce in various situations, and my own calculations would allow for enough control over the simulation for it to be possible to constain objects to the rope without extreme instability.</p>
+                        <p class="fs-5 mb-4">Unfortunately, without full control of the simulation, Verlet Integration alongside Jakobsen's method did not perform as well as it does in other situations. This video had a couple other problems going on with it - for one, my balance of how much control my constraints versus Unreal's simulation were each given was off - but part of the problem demonstrated here was that without complete correction from Jakobsen's method, the simulation quickly began to spin out of control.  </p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls> <!--pullObjectInsane-->
+                                <source src="" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">An early attempt at compromising between Unreal's physics simulation and my own calculations.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">Instead of choosing to modify this further, I chose to instead turn towards a different method of constraint. Earlier in the project, I had used a non-Jakobsen method of constraints for one other situation - when the player was grounded and the rope was taut. Similar to this current situation, in that one I did not have full control of the player since Unreal was handling character movement. I handled it by projecting the player's movement back within the accepted radius allowed by the rope, but otherwise not interfering with the way Unreal handled the character motion itself.</p>
+                        <p class="fs-5 mb-4">For pulled objects, moving in this direction meant allowing Unreal to have full control of the object's simulation. I still logged the previous and current position each frame to help with other calculations, but otherwise did not interfere. Then, when it came time to constrain the object, I chose once more to use this method of projecting back into accepted areas rather than Jakobsen's method of relaxation. Jakobsen's either does not easily allow for compromising on the position, such as instances where I've set a rest distance to zero, or it requires both points in the constraint to be adjusted. For the object, I did not want it to be pulling back on the rope, as that pull back would propogate down to the player and begin inhibiting player movement. I might revisit this idea as a stretch goal for making "heavy" objects that can be pulled by the rope, but it wasn't the objective this time. Thus, I just went with the method of projecting into allowed space.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/positionNegotiationCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for initial pulled object constraints.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">Above is the first part of the code for constraining pulled objects. As you can see, I had to be a bit careful with calculations for the Z constraint; allowing Unreal to simulate the object's gravity while keeping the object constrained to the rope was the hardest part to figure out. Giving the rope too much influence gave the objects a sort of "floaty" sort of drifting back to the ground, but giving Unreal too much control meant you couldn't pull objects up towards you if you were, for example, on top of a building and trying to grapple an object down on the ground. I ended up solving this by using separate calculations and correction weights for situations where the player was above the object they were pulling versus on even or lower level.</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls> <!--pullObjectFloatFall-->
+                                        <source src="" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">"Floaty" fall caused by giving the rope too much control in the Z correction.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls> <!--pullObjectBetterFall-->
+                                        <source src="" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">Improved fall from rebalancing and giving Unreal more control.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">It should be noted that the four "compare and contrast" videos above were actually taken after I had finished this week's work, and just went back to revert small parts of my code to show the difference a specific change had. This is because throughout all this week, genuine in progress videos trying to demonstrate an issue were all a bit overshadowed by a different problem that plagued me most of the week, and is the reason I say the code above is only the first part of constraining pulled objects.</p>
+                        <p class="fs-5 mb-4">When I created the functionality for allowing the player to pull themselves up a rope while hanging, I had to address the issue of the player naturally colliding with the wall they were up against while trying to move forward, since the anchor was closer to the wall than the player could be. I had resolved this issue by projecting out from the collision normal at the goal destination and raycasting back inwards to find the exact point of collision for a corrected location. This sort of consideration was also required for pulling objects, since every time I corrected the position of an object to remain constrained on the rope, I could be moving it through the floor or other surrounding objects. However, trying to resolve this the same way I did with the player...</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls> <!--pullObjectInsane2-->
+                                <source src="" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">An object jittering sideways through excessive correction.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">...clearly was not the answer. That particular problem was caused by trying to make this correction every frame, even when my own code didn't have any corrections to make and was deferring to Unreal's simulation, but it wasn't the only issue. Another major problem was that this projection allowed for objects to "jump" to higher locations they shouldn't be naturally pulled up.</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <img class="img-fluid rounded" src="../assets/badProjectOut.png" alt="..." />
+                                    <div class="text-muted fst-italic mb-2 mt-2">Diagram of the raycast that happens when close to a vertical wall.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls> <!--pullObjectTeleport-->
+                                        <source src="" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">The result - objects teleporting above their normal position.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">I originally resolved this by only allowing the projection correction if the hit normal was reasonable - AKA, we weren't hitting the side of a vertical wall - but then that prevented objects from being able to be dragged up the side of walls when the player was on top of a building trying to pull an object up towards them. I had to once more handle this in two separate ways depending on if the player was substantially above the object being pulled or not.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/forceThroughCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">The rest of the code for pulled object constraints, now handling several types of collision resolutions.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">Additionally, the rotation of the object had to be adjusted when the object was being pulled across the ground. Otherwise, slopes would be handled unnaturally.</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls> <!--pullObjectNoRot-->
+                                        <source src="" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">An object pulled over a slope and remaining even.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls> <!--pullObjectWithRot-->
+                                        <source src="" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">An object pulled over a slope and matching rotation.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">This rotation issue wasn't very prevelant when pulling objects up walls, but a different rotation problem was. When I had first used this method of projecting out of collisions for the player, I had multipled the vector out by a factor of leniancy, to ensure that the player would always find a non colliding spot no matter how cramped they were. However, when an object is rotated - and specifically, rotated in ways the player could not achieve that result in a different angle of the collider resting against the wall - the scale factor I was using created too much empty space, since scaling a skewed line would naturally thicken the path. This caused an inaccuracy in the projection that led to jittering against the wall.</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <img class="img-fluid rounded" src="../assets/badTraceSize.png" alt="..." />
+                                    <div class="text-muted fst-italic mb-2 mt-2">Scaling a rotated object causing the thickening of a skewed trace path.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls> <!--pullObjectJitterbug-->
+                                        <source src="" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">The result - object jittering against walls during collision correction.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">Once all of these issues were corrected, I was finally able to pull objects in all directions with mostly natural behavior. It's not perfect, but I think this is close to being the best it can be without having full control of my own more complex physics simulation, so that I don't have to compromise with Unreal.</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls> <!--pullObjectFinal-->
+                                <source src="" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">The final state of pulling objects.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">There is still a bit of cleanup I'd like to do here in the code itself - getting rid of magic numbers and the like - but unfortunately I ran out of time this week and wasn't able to put in the full 15 hours that is my weekly goal. I'll plan on making up this time next week, so this cleanup will happen then.</p>
+                        <p class="fs-5 mb-4">Outside of that, the main goal for next week is to begin progress on resolving collision between rope points and world objects. This will not include collision with other points on the rope, but hopefully this will at least begin to solve the issue of watching the rope disappear into the ground when you have too much slack.</p>
+                        <div class="row">
+                            <div class="col-lg-11">
+                                <a class="btn btn-primary" href="week5.html">Previous</a>
+                            </div>
+                            <div class="col-lg-1">
+                                <a class="btn btn-primary" href="../devblog.html">Next</a>
+                            </div>
+                        </div>
+                    </section>
+                </article>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>
