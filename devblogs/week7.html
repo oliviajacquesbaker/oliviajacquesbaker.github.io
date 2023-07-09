@@ -76,8 +76,8 @@
                         <p class="fs-5 mb-4">If the impact normal I get from that first downwards raycast is largely in the positive Z direction, I assume we're colliding with the floor and immediately jump to resolving the collision. Only if this majority Z direction check fails do I then take the impact normal and complete a second raycast in that direction, finding a correct impact point to resolve against.</p>
                         <p class="fs-5 mb-4">I began resolving collisions simply by setting the position of the point to be the collision point rather than its calculated colliding location. This worked in the sense that it did keep the rope out of collisions, but it disrupted the rope enough it became unstable.</p>
                         <figure class="mb-4">
-                            <video class="img-fluid rounded" controls> <!--collideUnstable-->
-                                <source src="" type="video/mp4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/ba5fbc9b363f90970183a5931de6ab21827d9233/assets/collideUnstable.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="text-muted fst-italic mb-2 mt-2">The rope staying out of collisions, but becoming unstable in the process - seen mostly with collision resolution against walls.</div>
@@ -88,8 +88,8 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <figure class="mb-4">
-                                    <video class="img-fluid rounded" controls> <!--collideLessUnstable-->
-                                        <source src="" type="video/mp4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/ba5fbc9b363f90970183a5931de6ab21827d9233/assets/collideLessUnstable.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                     <div class="text-muted fst-italic mb-2 mt-2">Reduced instability from capping the maximum velocity around a collision.</div>
@@ -97,8 +97,8 @@
                             </div>
                             <div class="col-lg-6">
                                 <figure class="mb-4">
-                                    <video class="img-fluid rounded" controls> <!--collideLessSlide-->
-                                        <source src="" type="video/mp4">
+                                    <video class="img-fluid rounded" controls> 
+                                        <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/ba5fbc9b363f90970183a5931de6ab21827d9233/assets/collideLessSlide.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                     <div class="text-muted fst-italic mb-2 mt-2">Removed 'ice skating' appearance from altering the previous position.</div>
@@ -108,8 +108,8 @@
                         <p class="fs-5 mb-4">Later I ended up coming back to this and changing the previous position to be close to the impact point but still with some small offset in the direction of the real previous position. This method, as opposed to just setting the previous position to the current one / the impact point, allowed for a bit more momentum to be kept even while keeping the appearance of friction in the system.</p>
                         <p class="fs-5 mb-4">The next problem I had to tackle could be seen briefly in the above video on reduced instability - rope points would sometimes get stuck above or beside the anchor when the collisions were against a wall. This seemed to be an issue with curved surfaces specifically, as I couldn't replicate it on flat ones.</p>
                         <figure class="mb-4">
-                            <video class="img-fluid rounded" controls> <!--collideFlatVsCurved-->
-                                <source src="" type="video/mp4">
+                            <video class="img-fluid rounded" controls> 
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/ba5fbc9b363f90970183a5931de6ab21827d9233/assets/collideFlatVsCurved.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="text-muted fst-italic mb-2 mt-2">Rope points getting stuck in odd positions when resolving collision against a curved wall versus a flat one.</div>
@@ -117,8 +117,8 @@
                         <p class="fs-5 mb-4">When I visualized the normals in these instances, it was revealed that occasionally, for curved surfaces only, it was finding an impact normal that was pointed sideways almost parallel to the wall itself. This was happening because the collision of my "curved" object wasn't really curved - it was a hexagon. The rope point would happen to collide with an edge of the hexagon, and on the edge there would be a chance that the impact normal would read as if it expected the face it was an edge of to continue in the opposite direction.</p>
                         <p class="fs-5 mb-4">I thouught that I had a solution to this by simply moving the end point of the trace outwards from the object. I would take the impact normal and add a normalized vector representing the direction from the impacted object's position to the actual impact point. That direction vector would always point out away from the impacted wall, so it would shift the raytrace vector to never be so completely sideways against the wall. However, although this solved the problem with curved walls, this created unintended consequences with other objects. In particular, walls that were at an angle against the global axis couldn't handle this well - the tilted raytrace vector ended up hitting the wall and finding an impact point just barely offset from where the actual impact point should have been, which over many frames caused the rope to be yanked sideways.</p>
                         <figure class="mb-4">
-                            <video class="img-fluid rounded" controls> <!--collideAngleMovesSideways-->
-                                <source src="" type="video/mp4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/ba5fbc9b363f90970183a5931de6ab21827d9233/assets/collideAngleMovesSideways.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="text-muted fst-italic mb-2 mt-2">Rope points getting pulled sideways when colliding with an angled wall.</div>
@@ -127,8 +127,8 @@
                         <p class="fs-5 mb-4">For points getting stuck above the anchor, it seemed like the issue was that projecting out of a collision would sometimes put the point above where it would naturally be, which would normally be fine... except that I was also modifying the previous position and therefore the velocity in a way that made it difficult for the point to then naturally fall back down. To fix this, I didn't alter the previous position's Z position at all, and then also enforced a smaller Z position on the current position when a collision with a wall would unnaturally force the point upwards.</p>
                         <p class="fs-5 mb-4">This alteration did have to be specified to only happen when the collision with a wall, though, or else points would sink straight into sloped floors:</p>
                         <figure class="mb-4">
-                            <video class="img-fluid rounded" controls> <!--collideThroughRamp-->
-                                <source src="" type="video/mp4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/ba5fbc9b363f90970183a5931de6ab21827d9233/assets/collideThroughRamp.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="text-muted fst-italic mb-2 mt-2">Rope points sinking into an angled floor due to preventions against collision resolution pushing points upwards.</div>
@@ -137,8 +137,8 @@
                         <p class="fs-5 mb-4">This change also resolved the issue of points getting pulled sideways on curved walls, which very pleasantly surprised me. I believe that specifically allowing the previous position to retain its natural Z position is what fixed that, since just like with the points getting stuck above, it's alright if points briefly get pushed sideways so long as they can naturally fall back down into place.</p>
                         <p class="fs-5 mb-4">And, with all those issues solved, the basic implementation of rope collision against world geometry was completed!</p>
                         <figure class="mb-4">
-                            <video class="img-fluid rounded" controls> <!--collideFirstPass-->
-                                <source src="" type="video/mp4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/ba5fbc9b363f90970183a5931de6ab21827d9233/assets/collideFirstPass.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
                             <div class="text-muted fst-italic mb-2 mt-2">Basic collision between the rope and world geometry, working on straight, curved, and angled surfaces.</div>
