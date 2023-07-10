@@ -58,7 +58,7 @@
                                 <li class="fs-5">The rope should not fall through the floor or walls.</li>
                                 <li class="fs-5">The rope should experience 'friction' when pulled against a surface.</li>
                                 <li class="fs-5">Begin planning how to handle the rope going around corners.</li>
-                                <li class="fs-5">Begin project optimization.</li>
+                                <li class="fs-5">Consider project optimization.</li>
                             </ul>
                         </p>
                         <p class="fs-5 mb-4">This week, my goal was to make solid progress on resolving rope collisions with world geometry. I worked from simple geometry up to more complex cases - beginning with allowing the rope to rest on the floor, and then against flat walls, and then against curved walls and angled floors.</p>
@@ -97,7 +97,7 @@
                             </div>
                             <div class="col-lg-6">
                                 <figure class="mb-4">
-                                    <video class="img-fluid rounded" controls> 
+                                    <video class="img-fluid rounded" controls>
                                         <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/ba5fbc9b363f90970183a5931de6ab21827d9233/assets/collideLessSlide.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
@@ -108,7 +108,7 @@
                         <p class="fs-5 mb-4">Later I ended up coming back to this and changing the previous position to be close to the impact point but still with some small offset in the direction of the real previous position. This method, as opposed to just setting the previous position to the current one / the impact point, allowed for a bit more momentum to be kept even while keeping the appearance of friction in the system.</p>
                         <p class="fs-5 mb-4">The next problem I had to tackle could be seen briefly in the above video on reduced instability - rope points would sometimes get stuck above or beside the anchor when the collisions were against a wall. This seemed to be an issue with curved surfaces specifically, as I couldn't replicate it on flat ones.</p>
                         <figure class="mb-4">
-                            <video class="img-fluid rounded" controls> 
+                            <video class="img-fluid rounded" controls>
                                 <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/ba5fbc9b363f90970183a5931de6ab21827d9233/assets/collideFlatVsCurved.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
@@ -153,10 +153,20 @@
                             <div class="text-muted fst-italic mb-2 mt-2">The adjusted code where a point calculates its velocity and considers if it has collisions in this frame.</div>
                         </figure>
                         <p class="fs-5 mb-4">The next step is to make this work when the player goes around a corner. This currently does not work, since only the individual points on the rope have collision detection, and more often than not the corner of a building does not end up lining up perfectly with one of these points, so the rope cuts through the corner.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/collideAroundCorner.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">The rope cutting through a corner of a building.</div>
+                        </figure>
                         <p class="fs-5 mb-4">However, I plan on saving this work for next week, as this felt like a natural point to break up the work. Since I wanted to make up my missing time from last week, though, I still had a some hours left of work for this week. I decided to use this time to look into optimization for this project.</p>
                         <p class="fs-5 mb-4">Optimization is not something I've ever gone very far into before, especially not for large game engines such as Unreal. However, I felt it was increasingly important with this project, especially after this week's work. Previously, I only had raycasts on frames where something attached to the rope ran into something. Now, every single point on the rope has at least one raycast per frame on top of all the rest of the work. At the very least, I wanted to profile the system to see if this was becoming a problem.</p>
-                        <p class="fs-5 mb-4">I had to spend a fair amount of time on research and tutorials setting up the various profiling tools Unreal has, but I was able to get the following results:</p>
-                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4">I admittedly ended up having to spend far more time just trying to figure out how to use and comprehend the Unreal Insights application than I spent on any actual optimization efforts, but I'm glad I got the chance to look into the tool. Once I figured out how to read the information available to me, things looked pretty encouraging - for a packaged developmental build the average frame rate sits at about 95 FPS, and a single call running through the entire grapple system takes on average 8.5 μs. There are multiple calls to this system per frame since I had synched it to Unreal's physics loop back in the beginning of the project, but the most calls seen in a frame seems to be about 6, with the average being 4. Even on the one large frame dip I recorded, my grapple system was performing consistently and was not the cause of the dip. </p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/profiling.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">A snapshot of the Unreal Insights tool, keyed to the largest frame dip recorded and with the grapple statistics highlighted.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">There didn't appear to be any obvious bottlenecks or issues with my code, but since I had spent so much time figuring out the Insights application, I wanted to try an optimization anyway to test comparing data. I only made small efforts - mostly just removing square roots where I could when considering vector lengths - but I completed several iterations of testing with the changes I made. I found that it could actually be fairly difficult to compare data sets across Insight logs due to the natural inconsistency across runs. I tried to complete the same basic actions in every run, but there would be natural inaccuracies in how many points are generated in a rope each run, or just how many rope points need to resolve collisions, or other such hard to replicate details that could affect profiling. I ended up just taking averages from several minutes of gameplay to try to reduce these issues, but I'm sure this was not a perfect effort.</p>
+                        <p class="fs-5 mb-4">Either way, the small changes I made did not make a noticible difference. The main cost sinks of the system are, after all, larger than square root calculations and have more to do with how many points and raycasts I complete each frame. I did not bother to pursue this further, though, since there weren't any performance issues and I wished to spend my time in places where my effort would have a more noticible impact.</p>
+                        <p class="fs-5 mb-4">Next week I'll continue where I left off on rope collisions, tackling the issue of ropes going around corners. This is the last major goal for this project, so if I continue to schedule, I'll be in a great place by the end of next week!</p>
                         <p class="fs-5 mb-4"></p>
                         <p class="fs-5 mb-4"></p>
                         <div class="row">
