@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Week 8 - Rope Collision with Corners</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">July 16, 2023</div>
+                    </header>
+            </div>
+            <div class="col-lg-10">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <img class="img-fluid rounded" src="../assets/cornerCollisionCover.png" alt="..." />
+                        <div class="text-muted fst-italic mb-2 mt-2">The rope correctly colliding with a corner.</div>
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5"><b>Logged Hours:</b> 15</p>
+                        <p class="fs-5">
+                            <b>Week of 7/10:</b> Resolve collisions between rope points and the corners of world geometry.
+                            <ul class="checkList">
+                                <li class="fs-5">The rope should not clip through building corners.</li>
+                                <li class="fs-5">The rope should be able to 'wrap' around a building, handling multiple corners at once.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5 mb-4">This week, my goal was to finish resolving rope collisions with world geometry by handling collisions with corners. I had gone into this week hoping that this would be solved simply by significantly decreasing the resting distance between points, such that it would be extremly likely that corners would be points of collision. I had figured that would solve what I had perceived to be the problem when I had glanced at this issue last week: that the rope cut through corners simply because the rope jumped from having a point on one side of the building to one on the other side.</p>
+                        <p class="fs-5 mb-4">However, it turned out the problem was bigger than that. Even with very small resting distances between points, the rope still cut through corners. When I turned the debug visuals for projecting out of collisions back on, I saw that the rope was correctly finding non colliding locations for all rope points. The problem was that, for stability, last week I had broken rope simulation into three phases. First, it would run a third of the constraint iterations necessary, then it would project out of collisions, and then it would run the remaining two thirds of constraint iterations. For corners, this meant that non colliding points were found, but in that second phase of constraint iterations, the relaxation between points forced the rope to cut through corners.</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <img class="img-fluid rounded" src="../assets/cornerSmallNotWorking.png" alt="..." />
+                                    <div class="text-muted fst-italic mb-2 mt-2">The rope cutting through corners even with small resting distances.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <img class="img-fluid rounded" src="../assets/cornerCompromiseTooMuch.png" alt="..." />
+                                    <div class="text-muted fst-italic mb-2 mt-2">Rope points being relaxed out of their non colliding positions.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">I did try reverting to having only a single constraint phase and then projecting out of collisions only after that was complete, but it didn't resolve the problem - then, it would fight between snapping out of collisions and trying to compromise the very next frame again, and it caused a bit of instability.</p>
+                        <p class="fs-5 mb-4">Most instability issues come from disruptions along the whole rope, though, so I tried narrowing this techniquue down to only two points. I still had the collision resolution stage happen in between two constraint phases, but in the second constraint phase, I treated corner points as if they were anchors, not allowing them to move and instead overcompromising on the points adjacent. I identified these corner points as any two points that both had a wall collision and where the collision normals of those two points had a significant angle between them.</p>
+                        <p class="fs-5 mb-4">This... sort of worked. It did succeed in forcing all the points to sit outside of collisions, since the points on either side of the 'anchored' corner points no longer had to negotiate with points on the other side of the corner and could relax along the axis of the geometry it was colliding with. However, the visuals didn't match, since the lines I was drawing only went from point to point and had no way to know that it should deviate to some unknown point that would represent the corner between the two labeled corner points.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/cornerNotRealistic.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">The purple points are 'corner' points and are forced into their non colliding positions. However, the rope itself still cuts through the corner to link them.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">On top of this issue, forcing corner points in this way only worked when there truly was a collision on both sides of the corner. Sometimes the point closer to the player wouldn't quite collide with the building, so the flag for 'anchored' corner points would never get raised in the first place.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/cornerNoCollideNoCollision.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">When one side of the corner doesn't have a direct collision, the corner flags never get turned on to begin with.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">At this point I decided to try a different method. After all, in order to even begin resolving the problems caused by this method, I would need to find where exactly the corner was in order to modify the rope's visuals to match that. And if I was already doing the work to discover where exactly the corner was, a beter solution would be to simply place a point on the corner itself. That would also resolve the unrealistic way that points wrapped around the corner as if stuck to the wall instead of just getting caught on the corner.</p>
+                        <p class="fs-5 mb-4">In order to discover where a corner was, I looked into how corner detection is usually done for mechanics such as wall hugging and wall running. I was really hoping to find a method that didn't include a whole bunch of ray traces, since that's how I've had to solve almost every problem within this project so far, but indeed the defacto solution in those sorts of mechanics is also raycast based. The idea is to send multiple raycasts into the direction of the wall, from where the relavant object currently is to where the object will be. If any of those raycasts fail to find the wall, the wall has disappeared - indicating a corner. In order to save performance, I ended up only running this check when I knew for a fact there was a corner via my previous check of the angle between impact normals, so it doesn't catch every case admittedly, but it is quite good and I prefer the slight inaccuracy over having potentially 50 times the number of raycasts.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/updatedWallCollisionCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Snippet from collision resolution - when the collision is with a wall, check collision normals to decide if there is a corner.</div>
+                        </figure>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/handleCornerCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Called only when we know for certain a corner exists between the two points. Discovers the corner and directly sets one points position to it.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">In the above code, you can see that once I've found where a corner is located, I move whichever of the corner points is closest to it to match that position exactly. You'll also see that I set the 'corner flag' of the point that gets moved to sit on the corner. This is the flag that I had been using previously to prevent relaxation from happening on the two points surrounding a corner; now I only need to worry about the one point and all others can get re-constrained.</p>
+                        <p class="fs-5 mb-4">These techniques combined worked pretty well for the rope points! You can see the point identifying and snapping to the corner, and then all other behavior just falls into place naturally based on other parts of the rope simulation. However, occasionally, the actual visual of the rope disappears...</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls><!--cornerWorkingNoLine-->
+                                <source src="" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">Debug spheres representing rope points show that corner collision is working, but the rope visual breaks.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">I've seen this bug a few times previously in this project - it happens when either one or more of the points is invalid (usually by becoming so unstable it shoots to infinity) or when the overall length of the rope is longer than it's supposed to be. In the past when I saw this bug, those underlying issues were things that needed to be fixed in order to maintain the integrity of the rope, so this visual bug naturally resolved itself through that process. However, I confirmed that none of the points were at invalid positions, and I needed to allow the rope length to be overall longer than what is "normal" when a corner collision is being resolved since the point that gets moved to sit on the corner will likely not be maintaining the correct rest distance.</p>
+                        <p class="fs-5 mb-4">I spent some time here trying to figure out how to resolve this, but I couldn't even figure out why the rope length being too long would cause this bug to begin with, since each individual line in the batch was set based on the two points' positions, not on any length-based thing. In the end, I decided to try a different method of rendering lines, since I needed to allow the rope to be a bit flexible in terms of length here.</p>
+                        <p class="fs-5 mb-4">Unfortunately, there aren't actually many methods of rendering lines within Unreal. In terms of options that will actually be displayed in release builds, there's only the line batch renderer (what I had been using), the HUD components, and spline mesh components. Of the two I hadn't tried, only spline mesh components work in 3D space. </p>
+                        <p class="fs-5 mb-4">For spline mesh components, you have to create a spline itself, and then assign mesh components to every segment of the spline with appropriate variables. The rope points were the points I fed into the spline, and then I had to create a set of meshes and update those each frame instead of sending requests to a line batch renderer. These elements were created when the rope was first generated, and then updated during the function where I draw the line after rope simulation has concluded.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/initializeVisualsCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Snippet from rope generation, creating a spline and a set of spline meshes to match the generated points.</div>
+                        </figure>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/createSplineMeshCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Helper function used to create a mesh component and initialize it with basic variables. The mesh is a simple skinny cylinder.</div>
+                        </figure>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/updateSplineCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Snippet from the function that draws the line, updating all the spline elements so that the meshes are deformed approproiately.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">Above are the main changes made to the rope code in order to allow for this new method of line renderering, but since the splines had to match the rope points, there are also minor updates in the functions that dynamically change rope size. The full code can be viewed on <a href="https://github.com/oliviajacquesbaker/RopeGrapple" target="_blank">github</a> if you'd like to see it all together.</p>
+                        <p class="fs-5 mb-4">With these updated visuals, the rope no longer experienced any sort of visual glitch, and I could see the corner handling working all together. Since I handle corners as I come across them, this solution naturally works with multiple corners, and lets the rope wrap around buildings to some extent!</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls> <!--cornerCollisionFinalResult-->
+                                        <source src="" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">Basic display of rope collision with a corner.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls> <!--cornerTwoCollisions-->
+                                        <source src="" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">Demonstration of a rope 'wrapping' around a building.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">One thing to keep in mind with the new implementation for visuals, though, is that it is not quite as performant as the line batch renderer. This is because the spline mesh components are actual meshes within the scene that get deformed each frame, and in frames when the rope changes size, some spline meshes get created and destroyed. All this opposed to the purely visual, not-a-real component method of the line batch renderer.</p>
+                        <p class="fs-5 mb-4">This project is still overall fine when it comes to performance, but it is dissatisfying to move to a less performant option than what I'd had for weeks. Luckily, next week is slated as a general 'debugging' week, so I can spend a bit of time trying to improve this. I'd like to consider refactoring my code so that rope points are no longer components, and instead I only use the spline mesh components without the sort of middleman that the rope points have become. This will be a larger structural change, especially because although it is minimal the rope point components do have some work done within them, but I'd like to give it a look.</p>
+                        <p class="fs-5 mb-4">After that, I'll run through some exhuastive level testing to ensure there aren't other bugs, and if all is well, I will consider moving on to the stretch goal of creating an inbetween type of object that can be dragged by the player but pulls back on the player in turn. I no longer feel the need to even consider the potential of revisiting the idea of "curved rope visuals" as a stretch goal, because the spline mesh component does that very thing automatically - if I had done it I actually had been planning on using the spline mesh components as a point of reference.</p>
+                        <p class="fs-5 mb-4">Overall, the project is coming to a pretty solid conclusion, just a few loose ends to tie up. Let's finish strong!</p>
+                        <p class="fs-5 mb-4"></p>
+                        <div class="row">
+                            <div class="col-lg-11">
+                                <a class="btn btn-primary" href="week7.html">Previous</a>
+                            </div>
+                            <div class="col-lg-1">
+                                <a class="btn btn-primary" href="../devblog.html">Next</a>
+                            </div>
+                        </div>
+                    </section>
+                </article>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>
