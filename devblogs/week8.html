@@ -76,7 +76,7 @@
                             </div>
                         </div>
                         <p class="fs-5 mb-4">I did try reverting to having only a single constraint phase and then projecting out of collisions only after that was complete, but it didn't resolve the problem - then, it would fight between snapping out of collisions and trying to compromise the very next frame again, and it caused a bit of instability.</p>
-                        <p class="fs-5 mb-4">Most instability issues come from disruptions along the whole rope, though, so I tried narrowing this techniquue down to only two points. I still had the collision resolution stage happen in between two constraint phases, but in the second constraint phase, I treated corner points as if they were anchors, not allowing them to move and instead overcompromising on the points adjacent. I identified these corner points as any two points that both had a wall collision and where the collision normals of those two points had a significant angle between them.</p>
+                        <p class="fs-5 mb-4">Most instability issues come from disruptions along the whole rope, though, so I tried narrowing this technique down to only two points. I still had the collision resolution stage happen in between two constraint phases, but in the second constraint phase, I treated corner points as if they were anchors, not allowing them to move and instead overcompromising on the points adjacent. I identified these corner points as any two points that both had a wall collision and where the collision normals of those two points had a significant angle between them.</p>
                         <p class="fs-5 mb-4">This... sort of worked. It did succeed in forcing all the points to sit outside of collisions, since the points on either side of the 'anchored' corner points no longer had to negotiate with points on the other side of the corner and could relax along the axis of the geometry it was colliding with. However, the visuals didn't match, since the lines I was drawing only went from point to point and had no way to know that it should deviate to some unknown point that would represent the corner between the two labeled corner points.</p>
                         <figure class="mb-4">
                             <img class="img-fluid rounded" src="../assets/cornerNotRealistic.png" alt="..." />
@@ -154,7 +154,7 @@
                                 <a class="btn btn-primary" href="week7.html">Previous</a>
                             </div>
                             <div class="col-lg-1">
-                                <a class="btn btn-primary" href="../devblog.html">Next</a>
+                                <a class="btn btn-primary" href="week8.html">Next</a>
                             </div>
                         </div>
                     </section>

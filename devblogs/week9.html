@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Week 9 - Testing and Debugging</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">July 23, 2023</div>
+                    </header>
+            </div>
+            <div class="col-lg-10">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <img class="img-fluid rounded" src="../assets/debuggingCover.png" alt="..." />
+                        <div class="text-muted fst-italic mb-2 mt-2">Debugging process of one of the issues discovered this week.</div>
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5"><b>Logged Hours:</b> 15</p>
+                        <p class="fs-5">
+                            <b>Week of 7/17:</b> Buffer week for project validation.
+                            <ul class="checkList">
+                                <li class="fs-5">Complete extensive level testing.</li>
+                                <li class="fs-5">Tackle bugs discovered during testing.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5 mb-4">This week was put aside as a bit of a buffer in case things went wrong earlier in the project. Since I actually ended up quite a bit ahead of my original schedule, last week I said that I would first do some extensive level testing this week and, if all turned out okay, I could tackle my final stretch goal this week. Unfortunately, during level testing, I found enough hidden bugs that it took up the entirety of this week, and may even spill a bit into the next.</p>
+                        <p class="fs-5 mb-4">The first thing I tried to tackle was not a bug, but had been a structural issue that bothered me last week. After the swap to using spline meshes for the rope's visual, I was bothered by the way the rope point objects felt like a middleman to just assigning the spline points, so I wanted to restructure the project to cut out that middleman. The idea was to just move the missing pieces into the rope class directly - I could use an array of vectors to hold all the previous positions, etc. I put a couple hours into this - it was a very large overhaul, to remove the smallest object I had been building up from this whole time - but before I even finished I realized I would regret it. There were more things on the rope point objects than just a position and a previous posiion, after all - there was also flags indicating if the point was an anchor or a corner point, information about gravitational forces, etc. I still don't like the way it feels like I calculate on the rope points just to forward the information on to the "real" object of the spline mesh, but removing the rope point made it, I believe, less readable. Sicne the project had no real performance issues, and since the goal of this project is a strong portfolio piece, I'd prefer readability over cutting out any possible unnecessary thing. So I ended up reverting the changes.</p>
+                        <p class="fs-5 mb-4">After that, I moved on to the first obscure bug I found: when I was testing performance in the Unreal Insights tool, I discovered that the physics was not consistent in engine versus in build. Specifically, any of the forces I added to the player from the rope were significantly stronger in build.</p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="" type="video/mp4"><!--debuggingInEngine-->
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">Reel in impulse in engine.</div>
+                                </figure>
+                            </div>
+                            <div class="col-lg-6">
+                                <figure class="mb-4">
+                                    <video class="img-fluid rounded" controls>
+                                        <source src="" type="video/mp4"><!--debuggingInBuild-->
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="text-muted fst-italic mb-2 mt-2">Reel in impulse in a packaged build.</div>
+                                </figure>
+                            </div>
+                        </div>
+                        <p class="fs-5 mb-4">Unreal's functions for adding forces and adding impulses are, in fact, framerate dependent. With the packaged build running almost twice as fast as the engine simulation, that was the cause of the issue. I tried to resolve it by limiting the number of times an impulse could be applied per rope generation to only once, and I tried dividing the force I was adding - which I verified to be consistent across engine and in build - by delta time. Then I tried multiplying the impulse force by <code>real deltaTime / expected deltaTime</code>, and then I just swapped the impulse I was adding to a command for the player to jump. None of these solutions fixed it.</p>
+                        <p class="fs-5 mb-4">This was an extremly frustrating build - any time I wished to test something, I had to completely repackage the project in order to test it in a build. More than that, I was confused why it was an issue to begin with, sicne all the way at the start of this project I had invested time into figuring out how to force my code to happen at fixed intervals with the physcis substepping options Unreal offered. But even though in engine everything was running at the substep I had designated, in builds, the substep was half what I had tuned everything to.</p>
+                        <p class="fs-5 mb-4">After quite a bit of frustration, I discovered that Unreal's substepping system is not actually constrained to your specifications unless you also constrain the framerate. It just so happened that the framerate in engine was consistent with my expectations. After setting constraints on the framerate itself - I chose to use the 'framerate smoothing' option as opposed to the 'fixed framerate,' since I had read that fixing the framerate could cause instability in all physics simulation if there was ever a frame drop below the fixed number - the problem was resolved.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/debuggingFramerate.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Updated project settings to ensure physics substepping would be adhered to in builds.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">The next bug I found was an issue with the way the rope bent when anchored on a 'ceiling' plane.</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="" type="video/mp4"><!--debuggingSplineCurve-->
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">The rope bending oddly when anchored on a 'ceiling' as opposed to other planes.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">Since I hadn't seen this bug before, I assumed that it was an issue with the new spline mesh visual - one element the spline mesh has that the previous line renderer didn't is the idea of tangents at points, which I had been letting automatically resolve. But I verified that the points of the rope were actually in those locations, and it wasn't the spline mesh just bending around them. It turned out that the projections I was doing to resolve rope collisions were catching on the ceiling and trying to project the points towards it, thinking that would be resolving a collision. The projection sizes I was using were quite large, so I first just tried lowering these so they'd never be longer than the rest distance between points. This worked fine when the rope was straight up and down, but failed when the rope was at an angle.</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="" type="video/mp4"><!--debuggingVisualSmallerTrace-->
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">The odd rope bend resolved when held up and down, but returning when the rope was at an angle close to a ceiling object.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">Instead, what I ended up having to do was verify that the collision normal I was resolving was not "against gravity" - for example, in the above case, the collision normal causing problems was a negative up vector. I did have to account for corners, since they could have odd Z normal values by nature of being a corner between two planes, but just ensuring the Z value was not significantly negative did the job.</p>
+                        <p class="fs-5 mb-4">During the testing of this last bug, making sure there were no other cases where projections were getting caught in odd ways, I noticed that I had never properly tested vertical corners last week! That is, any situation in which the rope runs up and down and encounters a corner along the way. Indeed, this situation was completely uncovered. It turned out that I was not even considering this case in my code; I only registered previous normal vectors and checked the angle between normals when the collision was not significantly up.</p>
+                        <p class="fs-5 mb-4">On top of never checking if the corner existed, it turned out my method of finding the corner was flawed as well. I was projecting traces out from one point's XY position to the other point's XY position, but that didn't work when the points were essentially on top of one another for a vertical corner. I adjusted so that the trace was done moving in the path of the impact normal I was not using for trace direction. That worked, and I was finally able to discover vertical corners, but there was a bit of instability...</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="" type="video/mp4"><!--debuggingCornerTopUnstable-->
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">The odd rope bend resolved when held up and down, but returning when the rope was at an angle close to a ceiling object.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">I thought this might have been a problem where the corner needed an extra frame to 'rest,' so to speak, and swapped my corner flag out for an corner count I could increment by more than I decremented it by, similar to the collision resolution count points had. However, this did not fix it. It turned out that the instabiltiy was caused by too many points catching on the top corner - when I had tried lowering the trace size for the above bug, and it wasn't the solution, I had then gone ahead and raised it again. Turns out that the smaller trace size was needed for a bug solution after all!</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/debuggingCornerTopFixed.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Vertical corners now being detected and resolved correctly.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">These updates, combined with the updates for the above bug, ended up with the following updated code for rope projection and corner resolution:</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/codeUpdateProjectAgain.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">The updated projection code, detecting cases where corners happen either horizontally or vertically.</div>
+                        </figure>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/codeUpdateCornerAgain.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">The updated corner handling code, searching for corners in the direction of an impact normal rather than on the XY plane between the two points.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">At this point, my project is complete and bug free... almost. A few weeks ago, I experienced an odd bug where the player teleported across the map seemingly randomly. I had been unable to recreate it at that time, so dismissed it to focus on that week's goals. This week, though, with all discovered bugs resolved, I wanted to spend the rest of this week's time trying to recreate and resolve that bug. It took some time, but I was finally able to do it.</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="" type="video/mp4"><!--debuggingTeleport-->
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">The player teleporting across the map after shooting towards the rope anchor.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">There were several key steps to replicating this bug: </p>
+                        <ul class="">
+                            <li class="fs-5">The player had to reach the rope anchor with erratic / large velocities.</li>
+                            <li class="fs-5">The anchor had to be substantially above the ground (turning player walk speed up very high and just sprinting towards a grounded anchor did not work).</li>
+                            <li class="fs-5">The object anchored onto needed to exist in a negative Z position.</li>
+                        </ul>
+                        <p class="fs-5 mb-4">At first I thought this was a collision issue - perhaps the player was getting forcibly moved through that overhang portion, and that was causing it to teleport. I had realized, after all, that the location the player was teleporting to was the world origin - so perhaps this was a way of "resetting" the player when it was forced into an impossible position. However, the bug persisted even after I turned collision off of that block... and, following the steps above, I was able to recreate the bug one single time on a building that did not have this overhang.</p>
+                        <p class="fs-5 mb-4">Unfortunately, even with some hours sunk into this, I remain baffled by this bug. I'm grateful it's a bit of an odd one, and on the harder side to replicate, but I was unable to solve it directly this week. I implemented a stopgap by putting limitations on the impulse force used for reeling in the player, so that it in theory can't ever get too strong, and also by limiting how short the rope can be made. But the bug can still be replicated if you try to...</p>
+                        <p class="fs-5 mb-4">I plan on seeking help with this bug this week. The conditional of 'the building must have a negative Z position' is the one that confuses me the most, but I've tried on both duplicates of this building across the map and by simply moving this one building to various locations - negative or positive Y positions are fine, so long as the Z position is negative. It's very strange... For now, I will simply have to settle for having made it more difficult to replicate.</p>
+                        <p class="fs-5 mb-4">Looking forward, next week is the last week of this project, with the final presentation complete for July 31. According to my schedule, this week is to be spent on polish, final review, and consideration of tooling for LDs. Specifically, I wanted to look into how a tool could be made to streamline the process of marking what is grappable and what isn't. No such tool will actually be made, but I want to have substantial research and understanding of how such a thing could be done as a consideration for a future extension of this project. On top of this, I will be investigating the teleporting bug, and hopefully with external help I will be able to get some more ideas of what could be causing it so that it too can be resolved, leaving the project 100% bug free.</p>
+                        <p class="fs-5 mb-4"></p>
+                        <div class="row">
+                            <div class="col-lg-11">
+                                <a class="btn btn-primary" href="week8.html">Previous</a>
+                            </div>
+                            <div class="col-lg-1">
+                                <a class="btn btn-primary" href="../devblog.html">Next</a>
+                            </div>
+                        </div>
+                    </section>
+                </article>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>
