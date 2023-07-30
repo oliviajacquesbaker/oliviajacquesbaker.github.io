@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Week 10 - Polish and Project Conclusion</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">July 30, 2023</div>
+                    </header>
+            </div>
+            <div class="col-lg-10">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <img class="img-fluid rounded" src="../assets/debuggingCover.png" alt="..." />
+                        <div class="text-muted fst-italic mb-2 mt-2">Debugging process of one of the issues discovered this week.</div>
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5"><b>Logged Hours:</b> 15</p>
+                        <p class="fs-5">
+                            <b>Week of 7/24:</b> Polish, final review, and consideration of tooling for LDs.
+                            <ul class="checkList">
+                                <li class="fs-5">Last week's final bug was marked resolved.</li>
+                                <li class="fs-5">Several audio cues were added.</li>
+                                <li class="fs-5">Final pass of code cleanup done.</li>
+                                <li class="fs-5">Research done into how this project could be integrated with an LD's work.</li>
+                            </ul>
+                        </p>
+                        <p class="fs-5 mb-4">This week's work began with sitting down one final time on the odd teleport bug I wrote about last week. Since it was really only consistently replicated on a single building, in a single location, and only with player speed and rope force values cranked way up, I did not want to spend this entire week on trying to track it down. However, it bothered me leaving it there when I had finally figured out how to replicate it, so I wanted to give it another few hours and see if that would be enough.</p>
+                        <p class="fs-5 mb-4">I did begin by reaching out to my professor about the bug, explaining how to replicate it and what I had tried so far, hoping that an outsider's perspective would help with my standstill on the problem. He pointed out that since at the moment of teleportation the 'velocity' of the player is extraordinarily high - aka, the difference between its position and previous position - I could probably set a break point on that event and examine it. If nothing else, simply discarding data where this velocity gets so outlandishly high might be enough to supress the bug.</p>
+                        <p class="fs-5 mb-4">Following this advice, I wasn't able to break on the moment of teleportation consistently, but I was able to get close enough to figure out where I did need to be breaking to hit the teleportation frame each time - when the player's movement mode changed from my custom hanging mode to the built in falling implementation. At first, looking into this, it seemed that what was happening was that the player was finding walkable ground under them, and was thinking they had "landed" at the world origin. I manually check for landing when the player is hanging in order to swap movement modes, and this function was always determining that the player had landed on the frame that the teleportation occured. But... this function was finding a valid floor, it was just that the floor it was finding was thousands of units away from the previous point on the rope.</p>
+                        <p class="fs-5 mb-4">So then it had to be that the problem was that for some reason the point of the rope constrained to the player's grapple gun was getting set to the teleported location. Looking at all places where that one point was set when others weren't, there was only one place that happened before checking for a landing - after adjusting the player's location for collisions in the way of simulation and constraint, I snapped this point to the grapple gun location. So it turned out the problem was that occasionally, the functions that handled finding a non colliding point at the ideal constraint location for the player would return a point at the world origin. </p>
+                        <p class="fs-5 mb-4">Within this function, before returning the calculated position, I checked if the calculated position was unreasonably far away from the position it was given to work with and tossed the data away if so. That solved it - it really was this function, something I had written weeks and weeks ago and runs every frame. I was baffled how this could be such a difficult to reproduce bug given where it was coming from. But, when I looked closer to find the cause of just why exactly this function occasionally gave nonsense, it turned out that I was missing a very simple check.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/debuggingTeleportFailedProject.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">A projection failing to find a colliding location, giving the trace result that it returns a zero vector for collision location.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">The above image shows the traces done by the problem function right before teleporting the player. The function was called because the player was unable to move to the goal location - the overhanging block was in the way. However, when it tried to find the point of collision in order to correct out of it, it couldn't find one, because the wall in the trace direction was indented far enough the trace didn't reach it. More to the point, the traces were simply in the wrong direction - they were looking for a collision to correct out of where the collision wasn't happening. And yet, I never considered the case where my 'handle collision' function may not actually find the collision I was trying to handle - no matter what, I returned the position the trace result held. And when there was no collision, that trace result held only a zero vector - setting me to the world origin!</p>
+                        <p class="fs-5 mb-4">For cases like this, I did not actually want to allow the player to project out of the "correct" collision - it would feel very odd if the player could simply get tugged past a ledge like this with no difficulty when they were swinging underneath it. So to solve this, I simply check if there was truly a collision, and have the player stay put if not.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/debuggingTeleportUpdatedCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">The updated code, with the only adjustment being a simple check for if a collision was found before returning collision data.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">It was certainly very frustrating to have put so many hours into a bug that was solved in less than a line of code, but at least I've brought anyone who reads this along the same painfully long journey with my many paragraphs detailing the process of debugging it, haha. That's programming for you!</p>
+                        <p class="fs-5 mb-4">Finally, I could move on to the proper polish of this project. I was happy with the default Unreal shoot animation for the gun, but I did want to add a couple sound effects to make the project feel a bit more interactive. I used a sound cue with randomization of sound waves for player footsteps, coordinating them within the character movement and sprint code. I also ensured a footstep played when movement modes changed from falling to landing, since this project has a lot of that. For the shooting sound effect, I wanted to make sure that the "hit" part of the effect varried in volume depending on how far away the anchor point was - I used Unreal's sound classes and sound mixes for the volume adjustments. All small things, but a nice opportunity to check out these Unreal tools, since I hadn't really had the chance to interface much with sounds in Unreal before.</p>
+                        <p class="fs-5 mb-4">I also completed a final pass through of the code to clean up anything egregiously bad and played with the grapple values just a bit more. Since I had resolved the teleportation bug, I could be less wary of larger force values, and made the rope a bit faster for fun. Then I built, confirmed once more that there were no discrepencies between engine and build, and packed it all up for github. The final build I made can be downloaded 
+                            <a href="../assets/GrappleGunDemo.rar" download>here.</a> :)</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="" type="video/mp4"> <!--finalRope-->
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">The final result of this project, now with some small sound effects and missing that nasty teleportation bug.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">The last thing that I wanted to do for this project was to consider how it could be integrated with an LD's work. In order to even generate a grapple, the "fire" raycast needs to discover a collider that responds to the grapple designated trace channel, and then the corresponding object needs to be tagged to indicate if it is an anchor or an object that can be dragged around. Not only is it a lot of work to individually tag many objects, there may certainly be use cases where oonly parts of a mesh should be grappable. For example, the LD should be able to indicate that only a ledge of a building is grappable, or other cases where the entire collider of a mesh should not be tagged.</p>
+                        <p class="fs-5 mb-4">The solution to this would, ideally, be a tool that allows LDs to "paint" on appropriate colliders and tags. This is not wildly unheard of for Unreal tools - in fact, there is a built in Unreal plugin I found called the Asset Placement Editor Mode Plugin that allows for this sort of "painted" generation, and even lets you select your own content to paint on, including blueprints. However, the tool is too imprecise. In the end, it was clearly made for the same purpose as the other known "brush" tools in Unreal - terrain generation and level blocking.</p>
+                        <figure class="mb-4">
+                            <video class="img-fluid rounded" controls>
+                                <source src="" type="video/mp4"> <!--assetPaintTool-->
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="text-muted fst-italic mb-2 mt-2">An attempt to "paint" blueprints onto the world containing a tagged and preset collider for grappling.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">The above video is with weight and strength turned down low, and with scaling randomization turned completely off, and yet it is still clearly hard to control. So while it would have been nice to think about using this tool for preparing levels for my grapple gun, it isn't feasible. Unreal's other built in option, geometry brushes, are the complete opposite side of the spectrum - there is no "paint" motion like the name brush implies, and instead individual faces must be manipulated. This gives precision, true... but even if it wasn't so slow, it only allows for primitive shapes that can be turned into static meshes, and there is no way to integrate your own blueprints or even simple colliders without geometry into the tool.</p>
+                        <p class="fs-5 mb-4">To achieve the ideal workflow I outlined, a custom tool would need to be used. There are tools out there that allow for custom blueprints to be generated along a spline curve, which is both precise and quicker than individually placing many colliders along a line, but in a case where the colliders are on a continuous line like that, they should really only be a single collider. Having more colliders than necessary is a performance concern, and cleaning up many small colliders into a single large one seems to just completely negate the benefits of how quickly those small colliders would be generated.</p>
+                        <p class="fs-5 mb-4">However, the truly custom generative tools I was able to find online seemed to fall into one of two categories: either the content is generated at run time as the player gives specifications and then the content is loaded from a "save" within the editor to exist out of play mode, or the generation happened within the blueprint's construction separate from the level entirely. Neither of these are ideal, but I believe the second is preferable. That way, LDs could go into a single blueprint and generate specifications per mesh, ideally quickly and with precision... and yet, even this seems a bit like a waste of time when you consider that the alternative would be to go into a single blueprint (or even stay within the main level) and just add hand placed collider BPs preset with grapple information.</p>
+                        <p class="fs-5 mb-4">Altogether, it really seems that - based on the tools I found that currently exist, which I'm using as a benchmark of what is feasible to be created for Unreal - a tool for this would be more trouble than it's worth. If anything, it may be more worthwhile to create a script that condenses similar colliders placed side by side into a single collider, such that perhaps the spline generation method could be used. Such a tool could have benefits in other cases too - cleaning up forms made from many small blocks, for example, and generally improving collision performance in a level. </p>
+                        <p class="fs-5 mb-4">Unfortunately, I have no plans to create such a tool in the immediate future, but it was interesting to look into generative tools within Unreal for this little aside, and perhaps could be something to be pursued in the future. For now, I'm happy with this project's current state and am proud to mark it as complete.</p>
+                        <p class="fs-5 mb-4">Looking back, it's interesting to compare my impressions of this project now versus when I was first going into it. I mentioned in this project's proposal that I've been a fan of grapple mechanics for many years, and have made many "cheesy" grapple guns in the past. I really thought going into this that, compared to a "real" grapple gun with a full rope simulation, those cheesy grapple projects would be trampled beneath my feet. In some ways, that was true - this project was absolutely several large steps above those in terms of the sorts of problems and math I had to think about to get it working, and I took this grapple much further than I had ever taken my past cheesy attempts.</p>
+                        <p class="fs-5 mb-4">However, when it comes to actual gameplay... I believe that what I have made is a fun toy, but when it comes down to it, I would rather play a game with a "cheesy" grapple over a "real" one like this. The rope simulation only remains accurate if it influences the player, but even the smallest of influences takes away from player control. I worked hard through this project to try to mitigate this with the default values I set, with limits on behavior, and with some small "inaccuracies" such as the impulses I added to players to allow them to fly at anchor points. However, even with these mitigations in place, I believe that this project remains far more a fun toy than a fun gameplay mechanic. I'm undoubtedly proud of what I've made here, but I also learned the perhaps too-late lesson that sometimes, "programming hacks" to make things faster and cheaper are in fact better design decisions, too.</p>
+                        <p class="fs-5 mb-4">Ah, well - I had fun, and I learned a lot that I'm sure will be applied to future projects that <i>will</i> have solid design decisions guiding them. I look forward to it, and to all the "cheesy" grapples I'm sure to come across in the future, as well. :)</p>
+                        <div class="row">
+                            <div class="col-lg-11">
+                                <a class="btn btn-primary" href="week9.html">Previous</a>
+                            </div>
+                            <div class="col-lg-1">
+                                <a class="btn btn-primary" href="../devblog.html">Next</a>
+                            </div>
+                        </div>
+                    </section>
+                </article>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>
