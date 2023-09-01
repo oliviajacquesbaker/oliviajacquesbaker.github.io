@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Olivia Jacques-Baker - Game Dev Portfolio</title>
+    <!-- Favicon-->
+    <link rel="icon" type="../image/x-icon" href="../assets/favicon.ico" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="../css/styles.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Responsive navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Olivia Jacques-Baker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" href="../index.html">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" aria-current="page" href="../devblog.html">Dev Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Page content-->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Post header-->
+                    <header class="mb-4">
+                        <!-- Post title-->
+                        <h1 class="fw-bolder mb-1">Grapple Gun with Simulated Rope</h1>
+                        <!-- Post meta content-->
+                        <div class="text-muted fst-italic mb-2">Last worked on in July 2023</div>
+                    </header>
+            </div>
+            <div class="col-lg-8">
+                <!-- Post content-->
+                <article>
+                    <!-- Preview image figure-->
+                    <figure class="mb-4">
+                        <video class="img-fluid rounded" controls>
+                            <source src="https://media.githubusercontent.com/media/oliviajacquesbaker/oliviajacquesbaker.github.io/main/assets/finalRope.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </figure>
+                    <!-- Post content-->
+                    <section class="mb-5">
+                        <p class="fs-5 mb-4">This project was completed as my personal programming project during grad school at FIEA. The goal was to create a grapple gun that allowed the player to swing on a rope, pull themselves up or down from an anchored object, and pull small objects towards them with the rope. For the rope itself, the goals were to have a rope that displayed some "bounciness" and could handle collision with world geometry, on top of having basic rope simulation.</p>
+                        <p class="fs-5 mb-4">The core of the rope simulation was completed using Verlet Integration for simulation and Jakobsen's method for constraints. Verlet Integration is a quick but largely accurate non-continuous physics simulation that stores the previous position instead of calculating velocity. This allows the simulation to be more numerically stable; a large part of the rope simulation process was working towards stability.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/verlet.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for using Verlet Integration for simulation. See <a href="https://www.youtube.com/watch?v=AZ8IGOHsjBk" target="_blank">this video</a> for how to derive this formula from Euler's.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">Jakobsen's method, then, can be described as enforcing a constraint through relaxation. The constraint works by comparing two connected points with what their desired rest distance is, and then splitting the required correction between both points. For example, if the desired rest distance is 10, and yet the Verlet simulation has stretched this distance to 20, simply moving both points inwards by 5 will resolve it.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/constrainPointsZoom.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Code for using Jakobsen's method of restraint relaxation for stick constraints.</div>
+                        </figure>
+                        <p class="fs-5 mb-4">That forms the base for the rope. To allow the rope to dynamically change size, points on the rope are marked as "intermediate" points that can have their resting distance adjusted. When the resting distance for these intermediate points becomes more than the "standard" resting distance for points on the rope, a new point is created, and when the resting distance becomes less than zero, a point is removed.</p>
+                        <p class="fs-5 mb-4">Player constraint on the rope, as well as constraining small, pullable objects on the rope, are done as "compromises" between simulations that I ran and what Unreal's physics engine came up with. This was to reap the benefits of an advanced physics simulation like the one Unreal provides without having to reinvent all of those calculations, but it does come at the cost of some stability, and had to be handled carefully. One issue that came from working on a set of compromises like this was the way Unreal handles setting the location of objects with collision. I had to turn sweeping on for these commands so that I could respond to collisions in the path of the ideal constraint location, but Unreal handles sweeping by stopping the location set as soon as something is struck. This meant I often had to project out of collisions at ideal constraint locations to get the correct compromised result.</p>
+                        <p class="fs-5 mb-4">Collision between rope points and world geometry was also done with projections out of collisions in the direction of the blocking normal. I handle collision with sharp corners, as well, and that is done with a similar method as techniques such as wallrunning. If you know a corner exists between two points - because, for example, the collision normals of those two points form a significant angle - then sweep in the direction of one normal while moving in the direction of the other. Eventually, you will fail to find a collision, and that is where you know you have found the corner. By simply moving one of the rope points to be fixed onto that corner point, the rest of the simulation will take care of the rest.</p>
+                        <figure class="mb-4">
+                            <img class="img-fluid rounded" src="../assets/handleCornerCode.png" alt="..." />
+                            <div class="text-muted fst-italic mb-2 mt-2">Called only when we know for certain a corner exists between the two points. Discovers the corner and directly sets one point's position to it.</div>
+                        </figure>
+                        <p class="fs-5 mb-4"></p>
+                        <p class="fs-5 mb-4">During the creation of this grapple gun, I maintained a weekly dev blog. For more detailed information about my process and explanations of a much larger portion of the code, you can check out those posts <a href="../devblog.html">here</a>.</p>
+                    </section>
+                </article>
+            </div>
+            <!-- Side widgets-->
+            <div class="col-lg-4">
+                <!-- Side widget-->
+                <div class="card mb-4">
+                    <div class="card-header">Project Overview</div>
+                    <div class="card-body">Source Code: <a class="text-muted" href="https://github.com/oliviajacquesbaker/RopeGrapple" target="_blank">Github Repo</a></div>
+                    <div class="card-body">Languages and Tools: <span class="text-muted">C++, Unreal 5.1</span></div>
+                    <div class="card-body">Team Size: <span class="text-muted">1 (Individual Effort)</span></div>
+                    <div class="card-body">Personal Responsibilities: <span class="text-muted">Rope simulation, rope collision with world geometry, rope extension and shortening, simulation of the player when on a rope, simulation of small objects when on a rope.</span></div>
+                    <div class="card-body">Status: <span class="text-muted">Complete</span></div>
+                    <div class="card-body">Time Spent: <span class="text-muted">125 hours</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer-->
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Olivia Jacques-Baker 2023</p></div>
+        <div class="container"><p class="m-0 text-center text-white">oliviajacquesbaker88@gmail.com | (407) 730-1975</p></div>
+    </footer>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+</html>

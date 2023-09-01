@@ -38,7 +38,7 @@
                             <!-- Post title-->
                             <h1 class="fw-bolder mb-1">Triangle Puzzle Game</h1>
                             <!-- Post meta content-->
-                            <div class="text-muted fst-italic mb-2">Last worked on in April 2023</div>
+                            <div class="text-muted fst-italic mb-2">Last worked on in August 2023</div>
                         </header>
                 </div>
                 <div class="col-lg-8">
@@ -55,7 +55,7 @@
                             <p class="fs-5 mb-4">This triangle puzzle game was created at the request of Dr. Enrique Ortiz, a professor at the School of Teacher Education at UCF. The first phase of development was completed as a school project; current development continues as external contract work.</p>
                             <p class="fs-5 mb-4">The goal of the game is to allow children to exercise their spatial reasoning and problem solving skills. Users should be allowed freedom in how they move and place shapes, and most puzzles have multiple solutions - some synonomous solutions (i.e. swapping two identical pieces with each other), some with more variable solutions.</p>
                             <p class="fs-5 mb-4">However, some precision is still necessary; we needed a way to prevent puzzle piece overlap without forcing a snapping grid on the puzzles. I solved this by snapping pieces away from each other, rather than towards each other or grid elements. There is a tiered movement system, where the snapping system tries to defer to Unity's collsion system. When Unity's collision system cannot solve the overlap itself, projection is used to find a way to remove the overlapping piece from the collision.</p>
-                            <p class="fs-5 mb-4">I also created a hint system that accounts for synonymous solutions in its hint delivery. It runs through each piece in the scene and asks if it has found a valid solution spot - does it overlap with the main puzzle shape, but not with the puzzle shape's edges? - and the first shape to answer "no" is what will have its correct solution given as a hint. If the location of the correct solution is currently overlapped by a synonymous piece, it looks for that synonymous piece's correct location and uses that.</p>
+                            <p class="fs-5 mb-4">I also created a hint system that accounts for synonymous solutions in its hint delivery. It runs through each piece in the scene and asks if it has found a valid solution spot - does it overlap with the main puzzle shape, but not with the puzzle shape's edges? - and the first shape to answer "no" is what will have its correct solution given as a hint. If the location of the correct solution is currently overlapped by a synonymous piece by a significant portion of the shape's area, it looks for that synonymous piece's correct location and uses that.</p>
                             <p class="fs-5 mb-4">My other work on this project includes tracking data and adding it to the "student report" feature, sound management, and general integration and debugging. The process of creating the puzzle shapes and assessing if they have been completed was handled by the other programmer.</p>
                             <h2 class="fw-bolder mb-4 mt-5"></h2>
                             <p class="fs-5 mb-4"></p>
@@ -72,8 +72,8 @@
                         <div class="card-body">Languages and Tools: <span class="text-muted">C#, Unity</span></div>
                         <div class="card-body">Team Size: <span class="text-muted">6 total, 2 programmers</span></div>
                         <div class="card-body">Personal Responsibilities: <span class="text-muted">Preventing puzzle piece overlap, a hint system, a tracking and report feature, sound management, integration and debugging.</span></div>
-                        <div class="card-body">Status: <span class="text-muted">Ongoing</span></div>
-                        <div class="card-body">Time Spent: <span class="text-muted">28 hours</span></div>
+                        <div class="card-body">Status: <span class="text-muted">Complete</span></div>
+                        <div class="card-body">Time Spent: <span class="text-muted">35 hours</span></div>
                     </div>
                 </div>
             </div>
